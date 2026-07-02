@@ -152,7 +152,32 @@ CREATE POLICY "Admin full access newsletter"
 
 
 -- ============================================================
--- 7. DONNÉE DE TEST : Témoignage de Caroline (par défaut)
+-- 7. TABLE : benevoles (Demandes de bénévolat)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.benevoles (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  nom          TEXT NOT NULL,
+  email        TEXT NOT NULL,
+  telephone    TEXT,
+  disponibilite TEXT,
+  message      TEXT,
+  lu           BOOLEAN DEFAULT false,
+  created_at   TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE public.benevoles ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Insertion publique benevoles"
+  ON public.benevoles FOR INSERT
+  WITH CHECK (true);
+
+CREATE POLICY "Admin full access benevoles"
+  ON public.benevoles FOR ALL
+  USING (auth.role() = 'authenticated');
+
+
+-- ============================================================
+-- 8. DONNÉE DE TEST : Témoignage de Caroline (par défaut)
 -- ============================================================
 INSERT INTO public.temoignages (nom, role, contenu, photo_url, publie)
 VALUES (

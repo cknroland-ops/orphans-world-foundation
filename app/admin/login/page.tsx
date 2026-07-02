@@ -45,7 +45,7 @@ export default function AdminLoginPage() {
           </h1>
         </div>
 
-        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <form onSubmit={handleLogin} autoComplete="off" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div>
             <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '8px' }}>
               Adresse email
@@ -56,6 +56,7 @@ export default function AdminLoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="admin@exemple.com"
               required
+              autoComplete="new-email"
               style={{ width: '100%', padding: '12px 16px', border: '1.5px solid #e5e7eb', borderRadius: '10px', fontSize: '15px', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
               onFocus={(e) => (e.target.style.borderColor = '#c0392b')}
               onBlur={(e) => (e.target.style.borderColor = '#e5e7eb')}
@@ -72,6 +73,7 @@ export default function AdminLoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
+              autoComplete="new-password"
               style={{ width: '100%', padding: '12px 16px', border: '1.5px solid #e5e7eb', borderRadius: '10px', fontSize: '15px', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
               onFocus={(e) => (e.target.style.borderColor = '#c0392b')}
               onBlur={(e) => (e.target.style.borderColor = '#e5e7eb')}

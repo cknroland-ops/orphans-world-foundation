@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
-import { FileText, LogOut, Plus, Trash2, BarChart2, Loader2, Upload, Database, Users, MessageCircle, Mail, Eye, Shield, KeyRound, CheckCircle2, Pencil, X } from 'lucide-react';
+import { FileText, LogOut, Plus, Trash2, BarChart2, Loader2, Upload, Database, Users, MessageCircle, Mail, Eye, Shield, KeyRound, CheckCircle2, Pencil, X, Download, Phone, Menu } from 'lucide-react';
 import { RichTextEditor } from '../../../components/RichTextEditor';
 
 type Article = {
@@ -24,14 +24,47 @@ type Stats = {
   visitesTotal: number;
 };
 
+type ContactMessage = {
+  id: string;
+  nom: string;
+  email: string;
+  telephone?: string;
+  sujet: string;
+  message: string;
+  lu: boolean;
+  created_at: string;
+};
+
+type NewsletterEmail = {
+  id: string;
+  email: string;
+  created_at: string;
+};
+
+type Benevole = {
+  id: string;
+  nom: string;
+  email: string;
+  telephone: string;
+  disponibilite: string;
+  message: string;
+  lu: boolean;
+  created_at: string;
+};
+
 const EMPTY_FORM = { titre: '', slug: '', extrait: '', image_url: '', categorie: 'blog', contenu: '', publie: true };
 const STORAGE_BUCKET = 'articles-images';
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const [tab, setTab] = useState<'stats' | 'blog' | 'security'>('stats');
+  const [tab, setTab] = useState<'stats' | 'blog' | 'security' | 'messages' | 'benevoles'>('stats');
   const [stats, setStats] = useState<Stats>({ newsletter: 0, contacts: 0, visitesToday: 0, visitesTotal: 0 });
   const [articles, setArticles] = useState<Article[]>([]);
+  const [contacts, setContacts] = useState<ContactMessage[]>([]);
+  const [newsletterEmails, setNewsletterEmails] = useState<NewsletterEmail[]>([]);
+  const [benevoles, setBenevoles] = useState<Benevole[]>([]);
+  const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
+  const [selectedBenevole, setSelectedBenevole] = useState<Benevole | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [formStatus, setFormStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [formError, setFormError] = useState('');
@@ -45,8 +78,10 @@ export default function AdminDashboard() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [pwdNew, setPwdNew] = useState('');
   const [pwdConfirm, setPwdConfirm] = useState('');
+  const [pwdCurrent, setPwdCurrent] = useState('');
   const [pwdStatus, setPwdStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [pwdError, setPwdError] = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -55,7 +90,18 @@ export default function AdminDashboard() {
 
   const today = new Date().toISOString().split('T')[0];
 
-  const loadData = async () => {
+  const loadMessages = useCallback(async () => {
+    const [contactsRes, newsletterRes, benevolesRes] = await Promise.all([
+      supabase.from('contacts').select('*').order('created_at', { ascending: false }),
+      supabase.from('newsletter').select('*').order('created_at', { ascending: false }),
+      supabase.from('benevoles').select('*').order('created_at', { ascending: false }),
+    ]);
+    setContacts(contactsRes.data ?? []);
+    setNewsletterEmails(newsletterRes.data ?? []);
+    setBenevoles(benevolesRes.data ?? []);
+  }, [supabase]);
+
+  const loadData = useCallback(async () => {
     setLoadingData(true);
     const [newsletterRes, contactsRes, articlesRes, visitesTodayRes, visitesTotalRes] = await Promise.all([
       supabase.from('newsletter').select('*', { count: 'exact', head: true }),
@@ -71,12 +117,91 @@ export default function AdminDashboard() {
       visitesTotal: visitesTotalRes.count ?? 0,
     });
     setArticles(articlesRes.data ?? []);
+    await loadMessages();
     setLoadingData(false);
+  }, [supabase, today, loadMessages]);
+
+  const markContactRead = async (id: string, lu: boolean) => {
+    await supabase.from('contacts').update({ lu }).eq('id', id);
+    await loadMessages();
+  };
+
+  const deleteContact = async (id: string) => {
+    if (!confirm('Supprimer ce message définitivement ?')) return;
+    await supabase.from('contacts').delete().eq('id', id);
+    setSelectedMessage(null);
+    await loadMessages();
+  };
+
+  const markBenevoleRead = async (id: string, lu: boolean) => {
+    await supabase.from('benevoles').update({ lu }).eq('id', id);
+    await loadMessages();
+  };
+
+  const deleteBenevole = async (id: string) => {
+    if (!confirm('Supprimer cette demande de bénévolat définitivement ?')) return;
+    await supabase.from('benevoles').delete().eq('id', id);
+    setSelectedBenevole(null);
+    await loadMessages();
+  };
+
+  const exportNewsletter = () => {
+    const csv = ["Email,Date d'inscription"].concat(
+      newsletterEmails.map(e => `${e.email},${new Date(e.created_at).toLocaleString('fr-FR')}`)
+    ).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `newsletter-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const exportContactsPDF = async () => {
+    const { jsPDF } = await import('jspdf');
+    const autoTable = (await import('jspdf-autotable')).default;
+    const doc = new jsPDF({ orientation: 'landscape' });
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.setTextColor(192, 57, 43);
+    doc.text('Messages reçus — Orphans World Foundation', 14, 18);
+    doc.setFontSize(10);
+    doc.setTextColor(120, 120, 120);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Exporté le ${new Date().toLocaleDateString('fr-FR')} · ${contacts.length} message(s)`, 14, 26);
+    autoTable(doc, {
+      startY: 32,
+      head: [['Nom', 'Email', 'Téléphone', 'Date', 'Sujet', 'Message']],
+      body: contacts.map(c => [
+        c.nom,
+        c.email,
+        c.telephone || 'N/A',
+        new Date(c.created_at).toLocaleDateString('fr-FR'),
+        c.sujet || 'Sans sujet',
+        c.message || '',
+      ]),
+      styles: { fontSize: 9, cellPadding: 3, overflow: 'linebreak' },
+      headStyles: { fillColor: [192, 57, 43], textColor: 255, fontStyle: 'bold' },
+      columnStyles: { 5: { cellWidth: 80 } },
+      alternateRowStyles: { fillColor: [249, 250, 251] },
+    });
+    doc.save(`messages-owf-${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
+    const timer = setTimeout(() => loadData(), 0);
+    return () => clearTimeout(timer);
+  }, [loadData]);
+
+  useEffect(() => {
+    if (tab === 'messages' || tab === 'benevoles') {
+      const timer = setTimeout(() => loadMessages(), 0);
+      return () => clearTimeout(timer);
+    }
+  }, [tab, loadMessages]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -120,8 +245,13 @@ export default function AdminDashboard() {
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     setPwdError('');
+    if (!pwdCurrent) {
+      setPwdError('Le mot de passe actuel est requis.');
+      setPwdStatus('error');
+      return;
+    }
     if (pwdNew.length < 8) {
-      setPwdError('Le mot de passe doit contenir au moins 8 caractères.');
+      setPwdError('Le nouveau mot de passe doit contenir au moins 8 caractères.');
       setPwdStatus('error');
       return;
     }
@@ -131,12 +261,25 @@ export default function AdminDashboard() {
       return;
     }
     setPwdStatus('loading');
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.email) {
+      setPwdError('Impossible de récupérer le compte actuel.');
+      setPwdStatus('error');
+      return;
+    }
+    const { error: verifyError } = await supabase.auth.signInWithPassword({ email: user.email, password: pwdCurrent });
+    if (verifyError) {
+      setPwdError('Le mot de passe actuel est incorrect.');
+      setPwdStatus('error');
+      return;
+    }
     const { error } = await supabase.auth.updateUser({ password: pwdNew });
     if (error) {
       setPwdError(error.message);
       setPwdStatus('error');
     } else {
       setPwdStatus('success');
+      setPwdCurrent('');
       setPwdNew('');
       setPwdConfirm('');
       setTimeout(() => setPwdStatus('idle'), 5000);
@@ -246,22 +389,47 @@ export default function AdminDashboard() {
   const sidebarItems = [
     { id: 'stats', label: 'Statistiques', icon: <BarChart2 size={18} /> },
     { id: 'blog', label: 'Gestion Blog', icon: <FileText size={18} /> },
+    { id: 'messages', label: 'Messages', icon: <Mail size={18} /> },
+    { id: 'benevoles', label: 'Bénévoles', icon: <Users size={18} /> },
     { id: 'security', label: 'Sécurité / Profil', icon: <Shield size={18} /> },
   ];
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#f3f4f6', fontFamily: 'DM Sans, sans-serif' }}>
+    <div className="flex" style={{ minHeight: '100vh', background: '#f3f4f6', fontFamily: 'DM Sans, sans-serif' }}>
+
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 lg:hidden"
+          style={{ background: 'rgba(15,24,36,0.5)' }}
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside style={{ width: '240px', background: '#0f1824', color: '#fff', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
-        <div style={{ padding: '32px 24px 24px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-          <div style={{ fontSize: '11px', letterSpacing: '2px', color: 'rgba(255,255,255,0.4)', marginBottom: '6px' }}>ADMIN</div>
-          <div style={{ fontSize: '16px', fontWeight: 700, color: '#fff' }}>OWF Dashboard</div>
+      <aside
+        className={`fixed top-0 left-0 h-full z-50 flex flex-col transition-transform duration-300 ease-in-out lg:static lg:h-auto lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        style={{ width: '240px', background: '#0f1824', color: '#fff', flexShrink: 0 }}
+      >
+        <div style={{ padding: '28px 20px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <div style={{ fontSize: '11px', letterSpacing: '2px', color: 'rgba(255,255,255,0.4)', marginBottom: '4px' }}>ADMIN</div>
+            <div style={{ fontSize: '15px', fontWeight: 700, color: '#fff' }}>OWF Dashboard</div>
+          </div>
+          <button
+            className="flex lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+            style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(255,255,255,0.08)', border: 'none', cursor: 'pointer', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.6)' }}
+          >
+            <X size={16} />
+          </button>
         </div>
-        <nav style={{ flex: 1, padding: '16px 0' }}>
+        <nav style={{ flex: 1, padding: '12px 0', overflowY: 'auto' }}>
           {sidebarItems.map(item => (
             <button
               key={item.id}
-              onClick={() => setTab(item.id as any)}
+              onClick={() => { setTab(item.id as any); setSidebarOpen(false); }}
+              className="transition-all hover:translate-y-[-2px]"
               style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', padding: '12px 24px', background: tab === item.id ? 'rgba(192,57,43,0.25)' : 'transparent', color: tab === item.id ? '#f87171' : 'rgba(255,255,255,0.6)', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: tab === item.id ? 600 : 400, borderLeft: tab === item.id ? '3px solid #c0392b' : '3px solid transparent', transition: 'all 0.2s' }}
             >
               {item.icon} {item.label}
@@ -279,7 +447,16 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Main */}
-      <main style={{ flex: 1, padding: '40px', overflowY: 'auto' }}>
+      <main className="flex-1 overflow-y-auto" style={{ minWidth: 0, padding: '32px 24px 40px 24px' }}>        {/* Mobile topbar */}
+        <div className="flex items-center gap-3 mb-6 lg:hidden">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            style={{ width: 42, height: 42, borderRadius: 10, background: '#0f1824', color: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+          >
+            <Menu size={20} />
+          </button>
+          <div style={{ fontSize: '15px', fontWeight: 700, color: '#0f1824' }}>OWF Dashboard</div>
+        </div>
         {loadingData && tab === 'stats' ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: '#6b7280' }}><Loader2 size={20} /> Chargement...</div>
         ) : (
@@ -330,7 +507,7 @@ export default function AdminDashboard() {
                       glow: 'rgba(139,92,246,0.12)',
                     },
                   ].map((card, i) => (
-                    <div key={i} style={{ background: '#fff', borderRadius: 20, padding: 28, boxShadow: `0 4px 24px ${card.glow}`, border: '1px solid rgba(0,0,0,0.04)', position: 'relative', overflow: 'hidden' }}>
+                    <div key={i} className="transition-all hover:translate-y-[-2px]" style={{ background: '#fff', borderRadius: 20, padding: 28, boxShadow: `0 4px 24px ${card.glow}`, border: '1px solid rgba(0,0,0,0.04)', position: 'relative', overflow: 'hidden' }}>
                       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: card.gradient }} />
                       <div style={{ width: 44, height: 44, borderRadius: 12, background: card.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', marginBottom: 18 }}>
                         {card.icon}
@@ -344,11 +521,60 @@ export default function AdminDashboard() {
                   ))}
                 </div>
 
-                <div style={{ background: '#fff', borderRadius: 20, padding: '28px 32px', boxShadow: '0 1px 6px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.04)' }}>
+                <div style={{ background: '#fff', borderRadius: 20, padding: '28px 32px', boxShadow: '0 1px 6px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.04)', marginBottom: 40 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}><Users size={16} color="#c0392b" /> À propos du suivi</div>
                   <p style={{ fontSize: 13, color: '#6b7280', lineHeight: 1.7, margin: 0 }}>
                     Les visiteurs sont comptabilisés de façon anonyme, une fois par jour par appareil. Aucune donnée personnelle n&apos;est collectée. Le compteur se remet à zéro chaque jour à minuit UTC.
                   </p>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 24, alignItems: 'start' }}>
+                  {/* Derniers messages */}
+                  <div className="transition-all hover:translate-y-[-2px]" style={{ background: '#fff', borderRadius: 20, padding: '28px 32px', boxShadow: '0 1px 6px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.04)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', display: 'flex', alignItems: 'center', gap: 8 }}><MessageCircle size={16} color="#c0392b" /> Derniers messages reçus</div>
+                      <button onClick={() => setTab('messages')} className="transition-all hover:translate-y-[-2px]" style={{ fontSize: 12, color: '#c0392b', fontWeight: 600, background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>Tout voir <Eye size={14} /></button>
+                    </div>
+                    {contacts.length === 0 ? (
+                      <p style={{ fontSize: 13, color: '#9ca3af', fontStyle: 'italic', margin: 0 }}>Aucun message pour l&apos;instant.</p>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                        {contacts.slice(0, 3).map(c => (
+                          <div key={c.id} className="transition-all hover:translate-y-[-2px]" onClick={() => setSelectedMessage(c)} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, alignItems: 'center', padding: '14px 16px', borderRadius: 14, border: '1px solid #f3f4f6', background: '#fafafa', cursor: 'pointer', transition: 'all 0.2s' }}>
+                            <div style={{ minWidth: 0 }}>
+                              <div style={{ fontSize: 14, fontWeight: 700, color: '#0f1824', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.nom}</div>
+                              <div style={{ fontSize: 12, color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.sujet || 'Sans sujet'}</div>
+                              <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>{new Date(c.created_at).toLocaleDateString('fr-FR')}</div>
+                            </div>
+                            <button onClick={e => { e.stopPropagation(); setSelectedMessage(c); }} style={{ padding: '6px 12px', borderRadius: 8, background: '#0f1824', color: '#fff', border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>Voir</button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Flux Newsletter */}
+                  <div className="transition-all hover:translate-y-[-2px]" style={{ background: '#fff', borderRadius: 20, padding: '28px 32px', boxShadow: '0 1px 6px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.04)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', display: 'flex', alignItems: 'center', gap: 8 }}><Mail size={16} color="#10b981" /> Flux Newsletter</div>
+                      <button onClick={exportNewsletter} className="transition-all hover:translate-y-[-2px]" style={{ fontSize: 12, color: '#065f46', fontWeight: 600, background: '#ecfdf5', border: '1px solid #d1fae5', borderRadius: 8, padding: '6px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}><Download size={14} /> Exporter</button>
+                    </div>
+                    {newsletterEmails.length === 0 ? (
+                      <p style={{ fontSize: 13, color: '#9ca3af', fontStyle: 'italic', margin: 0 }}>Aucune inscription pour l&apos;instant.</p>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        {newsletterEmails.slice(0, 5).map(e => (
+                          <div key={e.id} className="transition-all hover:translate-y-[-2px]" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderRadius: 12, border: '1px solid #f3f4f6', background: '#fafafa', transition: 'all 0.2s' }}>
+                            <div style={{ fontSize: 14, fontWeight: 600, color: '#0f1824', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>{e.email}</div>
+                            <div style={{ fontSize: 11, color: '#9ca3af', flexShrink: 0 }}>{new Date(e.created_at).toLocaleDateString('fr-FR')}</div>
+                          </div>
+                        ))}
+                        {newsletterEmails.length > 5 && (
+                          <div style={{ fontSize: 12, color: '#9ca3af', textAlign: 'center', marginTop: 4 }}>+ {newsletterEmails.length - 5} autres inscrits</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -362,7 +588,7 @@ export default function AdminDashboard() {
                 <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '16px', padding: '20px 28px', marginBottom: '32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
                   <div>
                     <div style={{ fontWeight: 700, color: '#92400e', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}><Database size={16} /> Importer les anciens articles</div>
-                    <div style={{ fontSize: '13px', color: '#b45309' }}>Insère les 7 articles historiques du site dans la base de données (ignorés s'ils existent déjà).</div>
+                    <div style={{ fontSize: '13px', color: '#b45309' }}>Insère les 7 articles historiques du site dans la base de données (ignorés s&apos;ils existent déjà).</div>
                     {seedMsg && <div style={{ fontSize: '13px', marginTop: 6, color: seedStatus === 'done' ? '#166534' : '#991b1b', fontWeight: 600 }}>{seedStatus === 'done' ? '✓ ' : '✗ '}{seedMsg}</div>}
                   </div>
                   <button onClick={handleSeed} disabled={seedStatus === 'loading' || seedStatus === 'done'} style={{ background: seedStatus === 'done' ? '#d1fae5' : '#f0a020', color: seedStatus === 'done' ? '#065f46' : '#fff', border: 'none', borderRadius: '10px', padding: '10px 20px', fontSize: '14px', fontWeight: 700, cursor: seedStatus === 'loading' || seedStatus === 'done' ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
@@ -396,7 +622,7 @@ export default function AdminDashboard() {
                       <input value={form.categorie} onChange={e => setForm(f => ({ ...f, categorie: e.target.value }))} placeholder="blog, santé, éducation..." style={inputStyle} />
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      <label style={{ fontSize: '13px', fontWeight: 600, color: '#374151' }}>Image de l'article</label>
+                      <label style={{ fontSize: '13px', fontWeight: 600, color: '#374151' }}>Image de l&apos;article</label>
                       <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, border: '2px dashed #e5e7eb', borderRadius: 10, padding: '16px', cursor: 'pointer', background: imagePreview ? '#f9fafb' : '#fff', transition: 'border-color 0.2s', minHeight: 80 }}
                         onDragOver={e => e.preventDefault()}
                         onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files?.[0]; if (f && f.type.startsWith('image/')) { setImageFile(f); setImagePreview(URL.createObjectURL(f)); } }}
@@ -456,7 +682,7 @@ export default function AdminDashboard() {
                 <div style={{ background: '#fff', borderRadius: '16px', padding: '32px', boxShadow: '0 1px 6px rgba(0,0,0,0.06)' }}>
                   <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#0f1824', marginBottom: '24px' }}>Articles existants ({articles.length})</h2>
                   {articles.length === 0 ? (
-                    <p style={{ color: '#9ca3af', fontStyle: 'italic' }}>Aucun article pour l'instant.</p>
+                    <p style={{ color: '#9ca3af', fontStyle: 'italic' }}>Aucun article pour l&apos;instant.</p>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                       {articles.map(a => (
@@ -491,6 +717,102 @@ export default function AdminDashboard() {
               </div>
             )}
 
+            {/* MESSAGES TAB */}
+            {tab === 'messages' && (
+              <div>
+                <div style={{ marginBottom: 32, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+                  <div>
+                    <div style={{ fontSize: 11, letterSpacing: 2, color: '#c0392b', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>COMMUNICATIONS</div>
+                    <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0f1824', margin: 0 }}>Messages reçus</h1>
+                    <p style={{ fontSize: 13, color: '#9ca3af', marginTop: 6 }}>{contacts.length} message{contacts.length > 1 ? 's' : ''} via le formulaire de contact.</p>
+                  </div>
+                  <button onClick={exportContactsPDF} className="transition-all hover:translate-y-[-2px]" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px', borderRadius: 12, background: '#0f1824', color: '#fff', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                    <Download size={15} /> Exporter PDF
+                  </button>
+                </div>
+
+                <div className="transition-all hover:translate-y-[-2px]" style={{ background: '#fff', borderRadius: 20, boxShadow: '0 1px 6px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.04)', overflow: 'hidden' }}>
+                  {contacts.length === 0 ? (
+                    <p style={{ color: '#9ca3af', fontStyle: 'italic', margin: 0, padding: '28px 32px' }}>Aucun message pour l&apos;instant.</p>
+                  ) : (
+                    <div style={{ overflowX: 'auto' }}>
+                      <div style={{ minWidth: 640 }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1.4fr 120px 80px 100px', gap: 12, padding: '12px 24px', fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #f3f4f6' }}>
+                          <div>Expéditeur</div>
+                          <div>Sujet</div>
+                          <div>Date</div>
+                          <div>État</div>
+                          <div style={{ textAlign: 'right' }}>Action</div>
+                        </div>
+                        {contacts.map(c => (
+                          <div key={c.id} className="transition-all hover:translate-y-[-2px]" style={{ display: 'grid', gridTemplateColumns: '1.4fr 1.4fr 120px 80px 100px', gap: 12, padding: '14px 24px', alignItems: 'center', fontSize: 13, borderBottom: '1px solid #f3f4f6', background: c.lu ? '#fff' : '#fff7ed', transition: 'all 0.2s' }}>
+                            <div style={{ minWidth: 0 }}>
+                              <div style={{ fontWeight: 700, color: '#0f1824', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.nom}</div>
+                              <div style={{ fontSize: 12, color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.email}</div>
+                            </div>
+                            <div style={{ color: '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.sujet || 'Sans sujet'}</div>
+                            <div style={{ fontSize: 12, color: '#6b7280' }}>{new Date(c.created_at).toLocaleDateString('fr-FR')}</div>
+                            <div>
+                              {c.lu ? (
+                                <span style={{ fontSize: 11, fontWeight: 600, color: '#166534', background: '#dcfce7', padding: '4px 8px', borderRadius: 20 }}>Lu</span>
+                              ) : (
+                                <span style={{ fontSize: 11, fontWeight: 600, color: '#92400e', background: '#ffedd5', padding: '4px 8px', borderRadius: 20 }}>Nouveau</span>
+                              )}
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
+                              <button onClick={() => setSelectedMessage(c)} style={{ padding: '6px 10px', borderRadius: 8, background: '#0f1824', color: '#fff', border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Voir</button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* BENEVOLES TAB */}
+            {tab === 'benevoles' && (
+              <div>
+                <div style={{ marginBottom: 40 }}>
+                  <div style={{ fontSize: 11, letterSpacing: 2, color: '#c0392b', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>ENGAGEMENT</div>
+                  <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0f1824', margin: 0 }}>Demandes de bénévolat</h1>
+                  <p style={{ fontSize: 13, color: '#9ca3af', marginTop: 6 }}>{benevoles.length} demande{benevoles.length > 1 ? 's' : ''} enregistrée{benevoles.length > 1 ? 's' : ''}.</p>
+                </div>
+
+                <div className="transition-all hover:translate-y-[-2px]" style={{ background: '#fff', borderRadius: 20, boxShadow: '0 1px 6px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.04)', overflow: 'hidden' }}>
+                  {benevoles.length === 0 ? (
+                    <p style={{ color: '#9ca3af', fontStyle: 'italic', margin: 0, padding: '28px 32px' }}>Aucune demande de bénévolat pour l&apos;instant.</p>
+                  ) : (
+                    <div style={{ overflowX: 'auto' }}>
+                      <div style={{ minWidth: 720 }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.2fr 120px 1fr 100px 80px', gap: 12, padding: '12px 24px', fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #f3f4f6' }}>
+                          <div>Nom</div>
+                          <div>Email</div>
+                          <div>Téléphone</div>
+                          <div>Disponibilité</div>
+                          <div>Date</div>
+                          <div style={{ textAlign: 'right' }}>Action</div>
+                        </div>
+                        {benevoles.map(b => (
+                          <div key={b.id} className="transition-all hover:translate-y-[-2px]" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.2fr 120px 1fr 100px 80px', gap: 12, padding: '14px 24px', alignItems: 'center', fontSize: 13, borderBottom: '1px solid #f3f4f6', background: b.lu ? '#fff' : '#f0f9ff', transition: 'all 0.2s' }}>
+                            <div style={{ fontWeight: 700, color: '#0f1824', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.nom}</div>
+                            <div style={{ color: '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.email}</div>
+                            <div style={{ fontSize: 12, color: '#6b7280' }}>{b.telephone || '-'}</div>
+                            <div style={{ fontSize: 12, color: '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.disponibilite || '-'}</div>
+                            <div style={{ fontSize: 12, color: '#6b7280' }}>{new Date(b.created_at).toLocaleDateString('fr-FR')}</div>
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
+                              <button onClick={() => setSelectedBenevole(b)} style={{ padding: '6px 10px', borderRadius: 8, background: '#0f1824', color: '#fff', border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Voir</button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* SECURITY TAB */}
             {tab === 'security' && (
               <div style={{ maxWidth: 560 }}>
@@ -516,7 +838,21 @@ export default function AdminDashboard() {
 
                   <form onSubmit={handlePasswordChange} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Nouveau mot de passe</label>
+                      <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Mot de passe actuel *</label>
+                      <input
+                        type="password"
+                        value={pwdCurrent}
+                        onChange={e => setPwdCurrent(e.target.value)}
+                        placeholder="••••••••"
+                        required
+                        style={pwdInputStyle}
+                        onFocus={e => (e.target.style.borderColor = '#c0392b')}
+                        onBlur={e => (e.target.style.borderColor = '#e5e7eb')}
+                      />
+                    </div>
+                    <div style={{ height: 1, background: '#f3f4f6' }} />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Nouveau mot de passe *</label>
                       <input
                         type="password"
                         value={pwdNew}
@@ -530,7 +866,7 @@ export default function AdminDashboard() {
                       />
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Confirmer le mot de passe</label>
+                      <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Confirmer le nouveau mot de passe *</label>
                       <input
                         type="password"
                         value={pwdConfirm}
@@ -585,6 +921,97 @@ export default function AdminDashboard() {
               </div>
             )}
           </>
+        )}
+
+        {/* Message detail modal */}
+        {selectedMessage && (
+          <div onClick={() => setSelectedMessage(null)} style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(10,16,26,0.75)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
+            <div onClick={e => e.stopPropagation()} style={{ background: '#1a2235', borderRadius: 20, width: '100%', maxWidth: 640, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 32px 80px rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column' }}>
+              {/* Header */}
+              <div style={{ padding: '24px 28px', borderBottom: '1px solid rgba(255,255,255,0.07)', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: 9, letterSpacing: 2, color: '#c0392b', fontWeight: 700, textTransform: 'uppercase', marginBottom: 6 }}>MESSAGE REÇU</div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: '#fff', marginBottom: 6, lineHeight: 1.3 }}>{selectedMessage.sujet || 'Sans sujet'}</div>
+                  <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>
+                    {selectedMessage.nom} &middot; {selectedMessage.email}
+                    {selectedMessage.telephone && <> &middot; <Phone size={11} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 3 }} />{selectedMessage.telephone}</>}
+                  </div>
+                </div>
+                <button onClick={() => setSelectedMessage(null)} style={{ width: 36, height: 36, borderRadius: 10, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.5)', flexShrink: 0 }}><X size={16} /></button>
+              </div>
+              {/* Body */}
+              <div style={{ padding: '24px 28px', flex: 1 }}>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginBottom: 16, letterSpacing: 0.5 }}>Reçu le {new Date(selectedMessage.created_at).toLocaleString('fr-FR')}</div>
+                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.82)', lineHeight: 1.9, whiteSpace: 'pre-wrap', background: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: '18px 20px', border: '1px solid rgba(255,255,255,0.07)' }}>{selectedMessage.message}</div>
+              </div>
+              {/* Reply actions */}
+              <div style={{ padding: '16px 28px', borderTop: '1px solid rgba(255,255,255,0.07)', display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                <a
+                  href={`mailto:${selectedMessage.email}?subject=R%C3%A9ponse%20-%20Orphans%20World%20Foundation&body=Bonjour%20${encodeURIComponent(selectedMessage.nom)}%2C%0A%0A`}
+                  style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', borderRadius: 10, background: '#c0392b', color: '#fff', fontSize: 13, fontWeight: 600, textDecoration: 'none', transition: 'opacity 0.2s' }}
+                  onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
+                  onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+                >
+                  <Mail size={14} /> Répondre par Email
+                </a>
+                {selectedMessage.telephone && (
+                  <a
+                    href={`https://wa.me/${selectedMessage.telephone.replace(/\D/g, '')}?text=${encodeURIComponent(`Bonjour ${selectedMessage.nom}, nous avons bien reçu votre message concernant "${selectedMessage.sujet || 'votre demande'}". — Orphans World Foundation`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', borderRadius: 10, background: '#25d366', color: '#fff', fontSize: 13, fontWeight: 600, textDecoration: 'none', transition: 'opacity 0.2s' }}
+                    onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
+                    onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+                  >
+                    <Phone size={14} /> Répondre via WhatsApp
+                  </a>
+                )}
+                <div style={{ flex: 1 }} />
+                <button onClick={() => { markContactRead(selectedMessage.id, !selectedMessage.lu); setSelectedMessage(null); }} style={{ padding: '10px 14px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {selectedMessage.lu ? 'Marquer non lu' : 'Marquer comme lu'}
+                </button>
+                <button onClick={() => deleteContact(selectedMessage.id)} style={{ padding: '10px 14px', borderRadius: 10, border: '1px solid rgba(252,165,165,0.3)', background: 'rgba(254,226,226,0.08)', color: '#f87171', fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}><Trash2 size={14} /> Supprimer</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Bénévole detail modal */}
+        {selectedBenevole && (
+          <div className="modal-overlay" onClick={() => setSelectedBenevole(null)} style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(15,24,36,0.55)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+            <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 620, maxHeight: '85vh', overflowY: 'auto', boxShadow: '0 24px 60px rgba(0,0,0,0.25)', border: '1px solid rgba(0,0,0,0.06)' }}>
+              <div style={{ padding: '28px 32px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+                <div>
+                  <div style={{ fontSize: 20, fontWeight: 800, color: '#0f1824', marginBottom: 4 }}>{selectedBenevole.nom}</div>
+                  <div style={{ fontSize: 13, color: '#6b7280' }}>{selectedBenevole.email}</div>
+                </div>
+                <button onClick={() => setSelectedBenevole(null)} style={{ width: 36, height: 36, borderRadius: 10, border: '1px solid #e5e7eb', background: '#f9fafb', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280' }}><X size={18} /></button>
+              </div>
+              <div style={{ padding: '28px 32px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>Téléphone</div>
+                    <div style={{ fontSize: 15, color: '#374151' }}>{selectedBenevole.telephone || '-'}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>Disponibilité</div>
+                    <div style={{ fontSize: 15, color: '#374151' }}>{selectedBenevole.disponibilite || '-'}</div>
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>Message</div>
+                    <div style={{ fontSize: 15, color: '#374151', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{selectedBenevole.message || '-'}</div>
+                  </div>
+                </div>
+                <div style={{ fontSize: 13, color: '#9ca3af' }}>Reçu le {new Date(selectedBenevole.created_at).toLocaleString('fr-FR')}</div>
+              </div>
+              <div style={{ padding: '20px 32px', borderTop: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+                <button onClick={() => deleteBenevole(selectedBenevole.id)} style={{ padding: '10px 16px', borderRadius: 10, border: '1px solid #fca5a5', background: '#fee2e2', color: '#991b1b', fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}><Trash2 size={14} /> Supprimer</button>
+                <button onClick={() => { markBenevoleRead(selectedBenevole.id, !selectedBenevole.lu); setSelectedBenevole(null); }} style={{ padding: '10px 18px', borderRadius: 10, border: 'none', background: selectedBenevole.lu ? '#f3f4f6' : '#0f1824', color: selectedBenevole.lu ? '#6b7280' : '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {selectedBenevole.lu ? 'Marquer non lu' : 'Marquer comme lu'}
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </main>
     </div>
