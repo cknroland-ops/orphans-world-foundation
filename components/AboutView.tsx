@@ -71,7 +71,7 @@ export const AboutView = ({ openModal }: { openModal: () => void }) => {
         <div style={{ position: "absolute", top: "10%", right: "-5%", width: 400, height: 400, background: "var(--crimson)", opacity: 0.05, filter: "blur(100px)", borderRadius: "50%", pointerEvents: "none" }}></div>
         <div style={{ position: "absolute", bottom: "-10%", left: "-5%", width: 600, height: 600, background: "var(--navy-primary)", opacity: 0.04, filter: "blur(120px)", borderRadius: "50%", pointerEvents: "none" }}></div>
         <div className="container" style={{ position: "relative", zIndex: 2 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 24, marginBottom: 56 }} className="reveal">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 24, marginBottom: 56 }} className="reveal team-header-row">
             <div>
               <div className="eyebrow eyebrow-crimson"><span className="eyebrow-dot"></span>Notre équipe</div>
               <h2 className="section-title-light">Notre héritage<br />en mouvement</h2>

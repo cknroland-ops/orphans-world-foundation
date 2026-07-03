@@ -65,8 +65,10 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
       <section className="hero">
         <div
           className="hero-bg"
-          style={{ transform: `translateY(${scrollY * 0.3}px) scale(1.05)`, backgroundImage: `url('/component_pictures/page_d_acceuil/herosection.png')`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-        />
+          style={{ transform: `translateY(${scrollY * 0.3}px) scale(1.05)` }}
+        >
+          <Image src="/component_pictures/page_d_acceuil/herosection.png" alt="" fill priority style={{ objectFit: 'cover' }} />
+        </div>
         <HeroParticles />
         <div className="hero-inner" style={{ gridTemplateColumns: '1fr' }}>
           <div className="hero-text">
@@ -308,7 +310,7 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
               <div className="eyebrow eyebrow-gold reveal"><span className="eyebrow-dot"></span>Blog</div>
               <h2 className="section-title-light reveal">Nos Dernières Histoires</h2>
             </div>
-            <button className="btn-outline reveal" onClick={() => goTo("blog")} style={{ flexShrink: 0 }}>Lire tout le blog →</button>
+            <button className="btn-outline reveal" onClick={() => goTo("blog")} style={{ flexShrink: 0, color: '#000' }}>Lire tout le blog →</button>
           </div>
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px' }}>

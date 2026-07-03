@@ -72,7 +72,7 @@ const STORAGE_BUCKET = 'articles-images';
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const [tab, setTab] = useState<'stats' | 'blog' | 'security' | 'messages' | 'benevoles' | 'events'>('stats');
+  const [tab, setTab] = useState<'stats' | 'blog' | 'security' | 'messages' | 'events'>('stats');
   const [stats, setStats] = useState<Stats>({ newsletter: 0, contacts: 0, visitesToday: 0, visitesTotal: 0 });
   const [articles, setArticles] = useState<Article[]>([]);
   const [contacts, setContacts] = useState<ContactMessage[]>([]);
@@ -277,7 +277,7 @@ export default function AdminDashboard() {
   }, [loadData]);
 
   useEffect(() => {
-    if (tab === 'messages' || tab === 'benevoles') {
+    if (tab === 'messages') {
       const timer = setTimeout(() => loadMessages(), 0);
       return () => clearTimeout(timer);
     }
@@ -474,8 +474,7 @@ export default function AdminDashboard() {
     { id: 'stats', label: 'Statistiques', icon: <BarChart2 size={18} /> },
     { id: 'blog', label: 'Gestion Blog', icon: <FileText size={18} /> },
     { id: 'events', label: 'Événements', icon: <CalendarDays size={18} /> },
-    { id: 'messages', label: 'Messages', icon: <Mail size={18} /> },
-    { id: 'benevoles', label: 'Bénévoles', icon: <Users size={18} /> },
+    { id: 'messages', label: 'Bénévoles', icon: <Users size={18} /> },
     { id: 'security', label: 'Sécurité / Profil', icon: <Shield size={18} /> },
   ];
 
@@ -669,18 +668,6 @@ export default function AdminDashboard() {
               <div>
                 <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#0f1824', marginBottom: '32px' }}>Gestion du Blog</h1>
 
-                {/* Seed banner */}
-                <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '16px', padding: '20px 28px', marginBottom: '32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
-                  <div>
-                    <div style={{ fontWeight: 700, color: '#92400e', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}><Database size={16} /> Importer les anciens articles</div>
-                    <div style={{ fontSize: '13px', color: '#b45309' }}>Insère les 7 articles historiques du site dans la base de données (ignorés s&apos;ils existent déjà).</div>
-                    {seedMsg && <div style={{ fontSize: '13px', marginTop: 6, color: seedStatus === 'done' ? '#166534' : '#991b1b', fontWeight: 600 }}>{seedStatus === 'done' ? '✓ ' : '✗ '}{seedMsg}</div>}
-                  </div>
-                  <button onClick={handleSeed} disabled={seedStatus === 'loading' || seedStatus === 'done'} style={{ background: seedStatus === 'done' ? '#d1fae5' : '#f0a020', color: seedStatus === 'done' ? '#065f46' : '#fff', border: 'none', borderRadius: '10px', padding: '10px 20px', fontSize: '14px', fontWeight: 700, cursor: seedStatus === 'loading' || seedStatus === 'done' ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                    {seedStatus === 'loading' ? <><Loader2 size={14} /> Import...</> : seedStatus === 'done' ? '✓ Importé' : <><Database size={14} /> Importer maintenant</>}
-                  </button>
-                </div>
-
                 {/* Form */}
                 <div style={{ background: '#fff', borderRadius: '16px', padding: '32px', boxShadow: '0 1px 6px rgba(0,0,0,0.06)', marginBottom: '40px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
@@ -771,29 +758,31 @@ export default function AdminDashboard() {
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                       {articles.map(a => (
-                        <div key={a.id} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', border: '1px solid #f3f4f6', borderRadius: '12px', background: '#fafafa' }}>
+                        <div key={a.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '16px', border: '1px solid #f3f4f6', borderRadius: '12px', background: '#fafafa', flexWrap: 'wrap' }}>
                           {a.image_url && <img src={a.image_url} alt={a.titre} style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8, flexShrink: 0 }} />}
-                          <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ flex: 1, minWidth: 180 }}>
                             <div style={{ fontWeight: 700, color: '#0f1824', fontSize: '15px', marginBottom: '4px' }}>{a.titre}</div>
                             <div style={{ fontSize: '12px', color: '#9ca3af' }}>{a.categorie} · {new Date(a.created_at).toLocaleDateString('fr-FR')}</div>
                           </div>
-                          <span style={{ fontSize: '12px', padding: '4px 10px', borderRadius: 20, background: a.publie ? '#dcfce7' : '#f3f4f6', color: a.publie ? '#166534' : '#6b7280', fontWeight: 600, flexShrink: 0 }}>
-                            {a.publie ? 'Publié' : 'Brouillon'}
-                          </span>
-                          <button
-                            onClick={() => handleEdit(a)}
-                            disabled={editingId === a.id}
-                            style={{ background: editingId === a.id ? '#eff6ff' : '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', borderRadius: '10px', padding: '8px 12px', cursor: editingId === a.id ? 'default' : 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6, fontSize: '13px', fontWeight: 600, opacity: editingId === a.id ? 0.5 : 1 }}
-                          >
-                            <Pencil size={14} /> {editingId === a.id ? 'En cours...' : 'Modifier'}
-                          </button>
-                          <button
-                            onClick={() => handleDelete(a.id)}
-                            disabled={deleting === a.id || editingId === a.id}
-                            style={{ background: '#fee2e2', color: '#c0392b', border: 'none', borderRadius: '10px', padding: '8px 12px', cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6, fontSize: '13px', fontWeight: 600 }}
-                          >
-                            {deleting === a.id ? <Loader2 size={14} /> : <Trash2 size={14} />} Supprimer
-                          </button>
+                          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', flexShrink: 0 }}>
+                            <span style={{ fontSize: '12px', padding: '4px 10px', borderRadius: 20, background: a.publie ? '#dcfce7' : '#f3f4f6', color: a.publie ? '#166534' : '#6b7280', fontWeight: 600 }}>
+                              {a.publie ? 'Publié' : 'Brouillon'}
+                            </span>
+                            <button
+                              onClick={() => handleEdit(a)}
+                              disabled={editingId === a.id}
+                              style={{ background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', borderRadius: '10px', padding: '8px 12px', cursor: editingId === a.id ? 'default' : 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: '13px', fontWeight: 600, opacity: editingId === a.id ? 0.5 : 1 }}
+                            >
+                              <Pencil size={14} /> {editingId === a.id ? 'En cours...' : 'Modifier'}
+                            </button>
+                            <button
+                              onClick={() => handleDelete(a.id)}
+                              disabled={deleting === a.id || editingId === a.id}
+                              style={{ background: '#fee2e2', color: '#c0392b', border: 'none', borderRadius: '10px', padding: '8px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: '13px', fontWeight: 600 }}
+                            >
+                              {deleting === a.id ? <Loader2 size={14} /> : <Trash2 size={14} />} Supprimer
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -858,62 +847,6 @@ export default function AdminDashboard() {
                                 style={{ padding: '6px 10px', borderRadius: 8, background: '#fee2e2', color: '#c0392b', border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, opacity: contactDeleting === c.id ? 0.6 : 1 }}
                               >
                                 {contactDeleting === c.id ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> : <Trash2 size={12} />}
-                                Supprimer
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* BENEVOLES TAB */}
-            {tab === 'benevoles' && (
-              <div>
-                <div style={{ marginBottom: 40 }}>
-                  <div style={{ fontSize: 11, letterSpacing: 2, color: '#c0392b', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>ENGAGEMENT</div>
-                  <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0f1824', margin: 0 }}>Demandes de bénévolat</h1>
-                  <p style={{ fontSize: 13, color: '#9ca3af', marginTop: 6 }}>{benevoles.length} demande{benevoles.length > 1 ? 's' : ''} enregistrée{benevoles.length > 1 ? 's' : ''}.</p>
-                </div>
-
-                <div className="transition-all hover:translate-y-[-2px]" style={{ background: '#fff', borderRadius: 20, boxShadow: '0 1px 6px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.04)', overflow: 'hidden' }}>
-                  {benevoles.length === 0 ? (
-                    <p style={{ color: '#9ca3af', fontStyle: 'italic', margin: 0, padding: '28px 32px' }}>Aucune demande de bénévolat pour l&apos;instant.</p>
-                  ) : (
-                    <div style={{ overflowX: 'auto' }}>
-                      <div style={{ minWidth: 720 }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.2fr 120px 1fr 100px 160px', gap: 12, padding: '12px 24px', fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #f3f4f6' }}>
-                          <div>Nom</div>
-                          <div>Email</div>
-                          <div>Téléphone</div>
-                          <div>Disponibilité</div>
-                          <div>Date</div>
-                          <div style={{ textAlign: 'right' }}>Actions</div>
-                        </div>
-                        {benevoles.map(b => (
-                          <div key={b.id} className="transition-all hover:translate-y-[-2px]" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.2fr 120px 1fr 100px 160px', gap: 12, padding: '14px 24px', alignItems: 'center', fontSize: 13, borderBottom: '1px solid #f3f4f6', background: b.lu ? '#fff' : '#f0f9ff', transition: 'all 0.2s' }}>
-                            <div style={{ fontWeight: 700, color: '#0f1824', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.nom}</div>
-                            <div style={{ color: '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.email}</div>
-                            <div style={{ fontSize: 12, color: '#6b7280' }}>{b.telephone || '-'}</div>
-                            <div style={{ fontSize: 12, color: '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.disponibilite || '-'}</div>
-                            <div style={{ fontSize: 12, color: '#6b7280' }}>{new Date(b.created_at).toLocaleDateString('fr-FR')}</div>
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
-                              <button onClick={() => setSelectedBenevole(b)} style={{ padding: '6px 10px', borderRadius: 8, background: '#0f1824', color: '#fff', border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Voir</button>
-                              <button
-                                onClick={async () => {
-                                  if (!confirm(`Supprimer la demande de ${b.nom} ? Cette action est irréversible.`)) return;
-                                  setBenevoleDeleting(b.id);
-                                  await supabase.from('benevoles').delete().eq('id', b.id);
-                                  setBenevoles(prev => prev.filter(x => x.id !== b.id));
-                                  setBenevoleDeleting(null);
-                                }}
-                                disabled={benevoleDeleting === b.id}
-                                style={{ padding: '6px 10px', borderRadius: 8, background: '#fee2e2', color: '#c0392b', border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, opacity: benevoleDeleting === b.id ? 0.6 : 1 }}
-                              >
-                                {benevoleDeleting === b.id ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> : <Trash2 size={12} />}
                                 Supprimer
                               </button>
                             </div>
@@ -1015,8 +948,8 @@ export default function AdminDashboard() {
                         const pct = ev.target_amount > 0 ? Math.min(100, Math.round((ev.current_amount / ev.target_amount) * 100)) : 0;
                         const isPast = new Date(ev.date) < new Date();
                         return (
-                          <div key={ev.id} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: 16, border: '1px solid #f3f4f6', borderRadius: 14, background: isPast ? '#fafafa' : '#fff', opacity: ev.status === 'paused' ? 0.65 : 1 }}>
-                            <div style={{ flex: 1, minWidth: 0 }}>
+                          <div key={ev.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: 16, border: '1px solid #f3f4f6', borderRadius: 14, background: isPast ? '#fafafa' : '#fff', opacity: ev.status === 'paused' ? 0.65 : 1, flexWrap: 'wrap' }}>
+                            <div style={{ flex: 1, minWidth: 180 }}>
                               <div style={{ fontWeight: 700, color: '#0f1824', fontSize: 15, marginBottom: 2 }}>{ev.title}</div>
                               <div style={{ fontSize: 12, color: '#9ca3af', marginBottom: isPast ? 0 : 8 }}>
                                 {new Date(ev.date).toLocaleString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
@@ -1032,33 +965,35 @@ export default function AdminDashboard() {
                                 </div>
                               )}
                             </div>
-                            {/* Status badge */}
-                            <span style={{ fontSize: 11, padding: '4px 10px', borderRadius: 20, background: ev.status === 'active' ? '#dcfce7' : ev.status === 'paused' ? '#fff7ed' : '#f3f4f6', color: ev.status === 'active' ? '#166534' : ev.status === 'paused' ? '#92400e' : '#6b7280', fontWeight: 600, flexShrink: 0 }}>
-                              {ev.status === 'active' ? 'Actif' : ev.status === 'paused' ? 'En pause' : 'Terminé'}
-                            </span>
-                            {/* Pause/Resume */}
-                            <button
-                              onClick={() => handleEventTogglePause(ev)}
-                              title={ev.status === 'active' ? 'Mettre en pause' : 'Réactiver'}
-                              style={{ background: ev.status === 'active' ? '#fff7ed' : '#dcfce7', color: ev.status === 'active' ? '#c0392b' : '#166534', border: `1px solid ${ev.status === 'active' ? '#fed7aa' : '#bbf7d0'}`, borderRadius: 10, padding: '8px 12px', cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600 }}
-                            >
-                              {ev.status === 'active' ? <><PauseCircle size={14} /> Pause</> : <><PlayCircle size={14} /> Réactiver</>}
-                            </button>
-                            {/* Edit */}
-                            <button
-                              onClick={() => handleEventEdit(ev)}
-                              style={{ background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', borderRadius: 10, padding: '8px 12px', cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600 }}
-                            >
-                              <Pencil size={14} /> Modifier
-                            </button>
-                            {/* Delete */}
-                            <button
-                              onClick={() => handleEventDelete(ev.id)}
-                              disabled={eventDeleting === ev.id}
-                              style={{ background: '#fee2e2', color: '#c0392b', border: 'none', borderRadius: 10, padding: '8px 12px', cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600 }}
-                            >
-                              {eventDeleting === ev.id ? <Loader2 size={14} /> : <Trash2 size={14} />} Supprimer
-                            </button>
+                            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', flexShrink: 0 }}>
+                              {/* Status badge */}
+                              <span style={{ fontSize: 11, padding: '4px 10px', borderRadius: 20, background: ev.status === 'active' ? '#dcfce7' : ev.status === 'paused' ? '#fff7ed' : '#f3f4f6', color: ev.status === 'active' ? '#166534' : ev.status === 'paused' ? '#92400e' : '#6b7280', fontWeight: 600 }}>
+                                {ev.status === 'active' ? 'Actif' : ev.status === 'paused' ? 'En pause' : 'Terminé'}
+                              </span>
+                              {/* Pause/Resume */}
+                              <button
+                                onClick={() => handleEventTogglePause(ev)}
+                                title={ev.status === 'active' ? 'Mettre en pause' : 'Réactiver'}
+                                style={{ background: ev.status === 'active' ? '#fff7ed' : '#dcfce7', color: ev.status === 'active' ? '#c0392b' : '#166534', border: `1px solid ${ev.status === 'active' ? '#fed7aa' : '#bbf7d0'}`, borderRadius: 10, padding: '8px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600 }}
+                              >
+                                {ev.status === 'active' ? <><PauseCircle size={14} /> Pause</> : <><PlayCircle size={14} /> Réactiver</>}
+                              </button>
+                              {/* Edit */}
+                              <button
+                                onClick={() => handleEventEdit(ev)}
+                                style={{ background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', borderRadius: 10, padding: '8px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600 }}
+                              >
+                                <Pencil size={14} /> Modifier
+                              </button>
+                              {/* Delete */}
+                              <button
+                                onClick={() => handleEventDelete(ev.id)}
+                                disabled={eventDeleting === ev.id}
+                                style={{ background: '#fee2e2', color: '#c0392b', border: 'none', borderRadius: 10, padding: '8px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600 }}
+                              >
+                                {eventDeleting === ev.id ? <Loader2 size={14} /> : <Trash2 size={14} />} Supprimer
+                              </button>
+                            </div>
                           </div>
                         );
                       })}

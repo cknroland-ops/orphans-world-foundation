@@ -27,6 +27,9 @@ export const metadata: Metadata = {
     description: "Soutenez Orphans World Foundation. Ensemble, changeons la vie des enfants orphelins et vulnérables par des dons, des parrainages et des actions concrètes sur le terrain.",
     images: ['/og-image.jpg'],
   },
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
