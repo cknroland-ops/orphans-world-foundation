@@ -30,24 +30,28 @@ export async function POST(req: NextRequest) {
     const gmailPass = process.env.GMAIL_APP_PASSWORD;
 
     if (gmailUser && gmailPass) {
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: { user: gmailUser, pass: gmailPass },
-      });
+      try {
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: { user: gmailUser, pass: gmailPass },
+        });
 
-      await transporter.sendMail({
-        from: `"OWF Contact" <${gmailUser}>`,
-        to: 'orphansworld020@gmail.com',
-        subject: `Nouveau message de ${nom}`,
-        html: `
-          <h2>Nouveau message via le formulaire de contact</h2>
-          <p><strong>Nom :</strong> ${nom}</p>
-          <p><strong>Email :</strong> ${email}</p>
-          ${phone ? `<p><strong>Téléphone :</strong> ${phone}</p>` : ''}
-          <p><strong>Message :</strong></p>
-          <p>${(notes || '(aucun message)').replace(/\n/g, '<br/>')}</p>
-        `,
-      });
+        await transporter.sendMail({
+          from: `"OWF Contact" <${gmailUser}>`,
+          to: 'orphansworld020@gmail.com',
+          subject: `Nouveau message de ${nom}`,
+          html: `
+            <h2>Nouveau message via le formulaire de contact</h2>
+            <p><strong>Nom :</strong> ${nom}</p>
+            <p><strong>Email :</strong> ${email}</p>
+            ${phone ? `<p><strong>Téléphone :</strong> ${phone}</p>` : ''}
+            <p><strong>Message :</strong></p>
+            <p>${(notes || '(aucun message)').replace(/\n/g, '<br/>')}</p>
+          `,
+        });
+      } catch (e) {
+        console.error('Email sending failed:', e);
+      }
     }
 
     return NextResponse.json({ success: true });
