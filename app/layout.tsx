@@ -6,9 +6,27 @@ import './custom.css';
 const cormorant = Cormorant_Garamond({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-cormorant' });
 const dmSans = DM_Sans({ subsets: ['latin'], weight: ['400', '500', '700'], variable: '--font-dmsans' });
 
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://orphansworldfoundation.org';
+
 export const metadata: Metadata = {
-  title: 'Orphans World Foundation',
-  description: 'Nous finançons des destins - Protection des droits de l\'enfant',
+  title: 'Orphans World Foundation | Aide aux Orphelins & Dons Humanitaires',
+  description: "Soutenez Orphans World Foundation. Ensemble, changeons la vie des enfants orphelins et vulnérables par des dons, des parrainages et des actions concrètes sur le terrain. Faites un impact dès aujourd'hui.",
+  metadataBase: new URL(BASE_URL),
+  openGraph: {
+    title: 'Orphans World Foundation | Aide aux Orphelins & Dons Humanitaires',
+    description: "Soutenez Orphans World Foundation. Ensemble, changeons la vie des enfants orphelins et vulnérables par des dons, des parrainages et des actions concrètes sur le terrain. Faites un impact dès aujourd'hui.",
+    url: BASE_URL,
+    siteName: 'Orphans World Foundation',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Orphans World Foundation – Aide aux enfants orphelins et vulnérables' }],
+    locale: 'fr_FR',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Orphans World Foundation | Aide aux Orphelins & Dons Humanitaires',
+    description: "Soutenez Orphans World Foundation. Ensemble, changeons la vie des enfants orphelins et vulnérables par des dons, des parrainages et des actions concrètes sur le terrain.",
+    images: ['/og-image.jpg'],
+  },
 };
 
 export default function RootLayout({children}: {children: React.ReactNode}) {

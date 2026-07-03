@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
-import { FileText, LogOut, Plus, Trash2, BarChart2, Loader2, Upload, Database, Users, MessageCircle, Mail, Eye, Shield, KeyRound, CheckCircle2, Pencil, X, Download, Phone, Menu } from 'lucide-react';
+import { FileText, LogOut, Plus, Trash2, BarChart2, Loader2, Upload, Database, Users, MessageCircle, Mail, Eye, Shield, KeyRound, CheckCircle2, Pencil, X, Download, Phone, Menu, CalendarDays, PauseCircle, PlayCircle } from 'lucide-react';
 import { RichTextEditor } from '../../../components/RichTextEditor';
 
 type Article = {
@@ -52,12 +52,27 @@ type Benevole = {
   created_at: string;
 };
 
+type OWFEvent = {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  location: string;
+  image_url: string;
+  target_amount: number;
+  current_amount: number;
+  status: 'active' | 'paused' | 'completed';
+  created_at: string;
+};
+
+const EMPTY_EVENT: { title: string; description: string; date: string; location: string; target_amount: number; current_amount: number; status: 'active' | 'paused' | 'completed' } = { title: '', description: '', date: '', location: '', target_amount: 0, current_amount: 0, status: 'active' };
+
 const EMPTY_FORM = { titre: '', slug: '', extrait: '', image_url: '', categorie: 'blog', contenu: '', publie: true };
 const STORAGE_BUCKET = 'articles-images';
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const [tab, setTab] = useState<'stats' | 'blog' | 'security' | 'messages' | 'benevoles'>('stats');
+  const [tab, setTab] = useState<'stats' | 'blog' | 'security' | 'messages' | 'benevoles' | 'events'>('stats');
   const [stats, setStats] = useState<Stats>({ newsletter: 0, contacts: 0, visitesToday: 0, visitesTotal: 0 });
   const [articles, setArticles] = useState<Article[]>([]);
   const [contacts, setContacts] = useState<ContactMessage[]>([]);
@@ -82,6 +97,14 @@ export default function AdminDashboard() {
   const [pwdStatus, setPwdStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [pwdError, setPwdError] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [events, setEvents] = useState<OWFEvent[]>([]);
+  const [eventForm, setEventForm] = useState<{ title: string; description: string; date: string; location: string; target_amount: number; current_amount: number; status: 'active' | 'paused' | 'completed' }>(EMPTY_EVENT);
+  const [eventEditingId, setEventEditingId] = useState<string | null>(null);
+  const [eventFormStatus, setEventFormStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [eventFormError, setEventFormError] = useState('');
+  const [eventDeleting, setEventDeleting] = useState<string | null>(null);
+  const [contactDeleting, setContactDeleting] = useState<string | null>(null);
+  const [benevoleDeleting, setBenevoleDeleting] = useState<string | null>(null);
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -89,6 +112,63 @@ export default function AdminDashboard() {
   );
 
   const today = new Date().toISOString().split('T')[0];
+
+  const loadEvents = useCallback(async () => {
+    const { data } = await supabase.from('events').select('*').order('date', { ascending: true });
+    setEvents((data as OWFEvent[]) ?? []);
+  }, [supabase]);
+
+  const handleEventSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!eventForm.title || !eventForm.date) {
+      setEventFormError('Titre et date sont obligatoires.');
+      setEventFormStatus('error');
+      return;
+    }
+    setEventFormStatus('loading');
+    setEventFormError('');
+    const payload = { ...eventForm, target_amount: Number(eventForm.target_amount), current_amount: Number(eventForm.current_amount) };
+    const { error } = eventEditingId
+      ? await supabase.from('events').update(payload).eq('id', eventEditingId)
+      : await supabase.from('events').insert(payload);
+    if (error) { setEventFormError(error.message); setEventFormStatus('error'); }
+    else {
+      setEventFormStatus('success');
+      setEventEditingId(null);
+      setEventForm(EMPTY_EVENT);
+      await loadEvents();
+      setTimeout(() => setEventFormStatus('idle'), 3000);
+    }
+  };
+
+  const handleEventEdit = (ev: OWFEvent) => {
+    setEventEditingId(ev.id);
+    setEventForm({ title: ev.title, description: ev.description ?? '', date: ev.date ? ev.date.slice(0, 16) : '', location: ev.location ?? '', target_amount: ev.target_amount, current_amount: ev.current_amount, status: ev.status });
+    setEventFormStatus('idle');
+    setEventFormError('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleEventDelete = async (id: string) => {
+    if (!confirm('Supprimer cet événement définitivement ?')) return;
+    setEventDeleting(id);
+    await supabase.from('events').delete().eq('id', id);
+    await loadEvents();
+    setEventDeleting(null);
+  };
+
+  const handleEventTogglePause = async (ev: OWFEvent) => {
+    const next = ev.status === 'active' ? 'paused' : 'active';
+    await supabase.from('events').update({ status: next }).eq('id', ev.id);
+    await loadEvents();
+  };
+
+  const handleEventCancelEdit = () => {
+    setEventEditingId(null);
+    setEventForm(EMPTY_EVENT);
+    setEventFormStatus('idle');
+    setEventFormError('');
+  };
 
   const loadMessages = useCallback(async () => {
     const [contactsRes, newsletterRes, benevolesRes] = await Promise.all([
@@ -201,7 +281,11 @@ export default function AdminDashboard() {
       const timer = setTimeout(() => loadMessages(), 0);
       return () => clearTimeout(timer);
     }
-  }, [tab, loadMessages]);
+    if (tab === 'events') {
+      const timer = setTimeout(() => loadEvents(), 0);
+      return () => clearTimeout(timer);
+    }
+  }, [tab, loadMessages, loadEvents]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -389,6 +473,7 @@ export default function AdminDashboard() {
   const sidebarItems = [
     { id: 'stats', label: 'Statistiques', icon: <BarChart2 size={18} /> },
     { id: 'blog', label: 'Gestion Blog', icon: <FileText size={18} /> },
+    { id: 'events', label: 'Événements', icon: <CalendarDays size={18} /> },
     { id: 'messages', label: 'Messages', icon: <Mail size={18} /> },
     { id: 'benevoles', label: 'Bénévoles', icon: <Users size={18} /> },
     { id: 'security', label: 'Sécurité / Profil', icon: <Shield size={18} /> },
@@ -484,7 +569,7 @@ export default function AdminDashboard() {
                     },
                     {
                       label: 'Messages reçus',
-                      value: stats.contacts,
+                      value: contacts.length,
                       sub: 'Via le formulaire de contact',
                       icon: <MessageCircle size={20} />,
                       gradient: 'linear-gradient(135deg,#92400e,#f59e0b)',
@@ -737,15 +822,15 @@ export default function AdminDashboard() {
                   ) : (
                     <div style={{ overflowX: 'auto' }}>
                       <div style={{ minWidth: 640 }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1.4fr 120px 80px 100px', gap: 12, padding: '12px 24px', fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #f3f4f6' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1.4fr 120px 80px 160px', gap: 12, padding: '12px 24px', fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #f3f4f6' }}>
                           <div>Expéditeur</div>
                           <div>Sujet</div>
                           <div>Date</div>
                           <div>État</div>
-                          <div style={{ textAlign: 'right' }}>Action</div>
+                          <div style={{ textAlign: 'right' }}>Actions</div>
                         </div>
                         {contacts.map(c => (
-                          <div key={c.id} className="transition-all hover:translate-y-[-2px]" style={{ display: 'grid', gridTemplateColumns: '1.4fr 1.4fr 120px 80px 100px', gap: 12, padding: '14px 24px', alignItems: 'center', fontSize: 13, borderBottom: '1px solid #f3f4f6', background: c.lu ? '#fff' : '#fff7ed', transition: 'all 0.2s' }}>
+                          <div key={c.id} className="transition-all hover:translate-y-[-2px]" style={{ display: 'grid', gridTemplateColumns: '1.4fr 1.4fr 120px 80px 160px', gap: 12, padding: '14px 24px', alignItems: 'center', fontSize: 13, borderBottom: '1px solid #f3f4f6', background: c.lu ? '#fff' : '#fff7ed', transition: 'all 0.2s' }}>
                             <div style={{ minWidth: 0 }}>
                               <div style={{ fontWeight: 700, color: '#0f1824', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.nom}</div>
                               <div style={{ fontSize: 12, color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.email}</div>
@@ -761,6 +846,20 @@ export default function AdminDashboard() {
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
                               <button onClick={() => setSelectedMessage(c)} style={{ padding: '6px 10px', borderRadius: 8, background: '#0f1824', color: '#fff', border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Voir</button>
+                              <button
+                                onClick={async () => {
+                                  if (!confirm(`Supprimer le message de ${c.nom} ? Cette action est irréversible.`)) return;
+                                  setContactDeleting(c.id);
+                                  await supabase.from('contacts').delete().eq('id', c.id);
+                                  setContacts(prev => prev.filter(m => m.id !== c.id));
+                                  setContactDeleting(null);
+                                }}
+                                disabled={contactDeleting === c.id}
+                                style={{ padding: '6px 10px', borderRadius: 8, background: '#fee2e2', color: '#c0392b', border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, opacity: contactDeleting === c.id ? 0.6 : 1 }}
+                              >
+                                {contactDeleting === c.id ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> : <Trash2 size={12} />}
+                                Supprimer
+                              </button>
                             </div>
                           </div>
                         ))}
@@ -786,16 +885,16 @@ export default function AdminDashboard() {
                   ) : (
                     <div style={{ overflowX: 'auto' }}>
                       <div style={{ minWidth: 720 }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.2fr 120px 1fr 100px 80px', gap: 12, padding: '12px 24px', fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #f3f4f6' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.2fr 120px 1fr 100px 160px', gap: 12, padding: '12px 24px', fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #f3f4f6' }}>
                           <div>Nom</div>
                           <div>Email</div>
                           <div>Téléphone</div>
                           <div>Disponibilité</div>
                           <div>Date</div>
-                          <div style={{ textAlign: 'right' }}>Action</div>
+                          <div style={{ textAlign: 'right' }}>Actions</div>
                         </div>
                         {benevoles.map(b => (
-                          <div key={b.id} className="transition-all hover:translate-y-[-2px]" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.2fr 120px 1fr 100px 80px', gap: 12, padding: '14px 24px', alignItems: 'center', fontSize: 13, borderBottom: '1px solid #f3f4f6', background: b.lu ? '#fff' : '#f0f9ff', transition: 'all 0.2s' }}>
+                          <div key={b.id} className="transition-all hover:translate-y-[-2px]" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.2fr 120px 1fr 100px 160px', gap: 12, padding: '14px 24px', alignItems: 'center', fontSize: 13, borderBottom: '1px solid #f3f4f6', background: b.lu ? '#fff' : '#f0f9ff', transition: 'all 0.2s' }}>
                             <div style={{ fontWeight: 700, color: '#0f1824', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.nom}</div>
                             <div style={{ color: '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.email}</div>
                             <div style={{ fontSize: 12, color: '#6b7280' }}>{b.telephone || '-'}</div>
@@ -803,10 +902,166 @@ export default function AdminDashboard() {
                             <div style={{ fontSize: 12, color: '#6b7280' }}>{new Date(b.created_at).toLocaleDateString('fr-FR')}</div>
                             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
                               <button onClick={() => setSelectedBenevole(b)} style={{ padding: '6px 10px', borderRadius: 8, background: '#0f1824', color: '#fff', border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Voir</button>
+                              <button
+                                onClick={async () => {
+                                  if (!confirm(`Supprimer la demande de ${b.nom} ? Cette action est irréversible.`)) return;
+                                  setBenevoleDeleting(b.id);
+                                  await supabase.from('benevoles').delete().eq('id', b.id);
+                                  setBenevoles(prev => prev.filter(x => x.id !== b.id));
+                                  setBenevoleDeleting(null);
+                                }}
+                                disabled={benevoleDeleting === b.id}
+                                style={{ padding: '6px 10px', borderRadius: 8, background: '#fee2e2', color: '#c0392b', border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, opacity: benevoleDeleting === b.id ? 0.6 : 1 }}
+                              >
+                                {benevoleDeleting === b.id ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> : <Trash2 size={12} />}
+                                Supprimer
+                              </button>
                             </div>
                           </div>
                         ))}
                       </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* EVENTS TAB */}
+            {tab === 'events' && (
+              <div>
+                <div style={{ marginBottom: 32 }}>
+                  <div style={{ fontSize: 11, letterSpacing: 2, color: '#c0392b', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>WIDGET PUBLIC</div>
+                  <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0f1824', margin: 0 }}>Gestion des Événements</h1>
+                  <p style={{ fontSize: 13, color: '#9ca3af', marginTop: 6 }}>Les événements actifs apparaissent dans le widget flottant sur le site public.</p>
+                </div>
+
+                {/* Form */}
+                <div style={{ background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 1px 6px rgba(0,0,0,0.06)', marginBottom: 32 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                    <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0f1824', display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
+                      {eventEditingId ? <><Pencil size={20} color="#c0392b" /> Modifier l&apos;événement</> : <><Plus size={20} color="#c0392b" /> Nouvel événement</>}
+                    </h2>
+                    {eventEditingId && (
+                      <button onClick={handleEventCancelEdit} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: 8, cursor: 'pointer', fontSize: 13, color: '#6b7280', fontWeight: 600 }}>
+                        <X size={14} /> Annuler
+                      </button>
+                    )}
+                  </div>
+
+                  <form onSubmit={handleEventSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Titre *</label>
+                      <input value={eventForm.title} onChange={e => setEventForm(f => ({ ...f, title: e.target.value }))} placeholder="Nom de l'événement" style={inputStyle} />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Date & Heure *</label>
+                      <input type="datetime-local" value={eventForm.date} onChange={e => setEventForm(f => ({ ...f, date: e.target.value }))} style={inputStyle} />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Lieu</label>
+                      <input value={eventForm.location} onChange={e => setEventForm(f => ({ ...f, location: e.target.value }))} placeholder="Bukavu, RDC" style={inputStyle} />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Objectif de collecte ($)</label>
+                      <input type="number" min={0} value={eventForm.target_amount} onChange={e => setEventForm(f => ({ ...f, target_amount: Number(e.target.value) }))} placeholder="0" style={inputStyle} />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Montant actuel ($)</label>
+                      <input type="number" min={0} value={eventForm.current_amount} onChange={e => setEventForm(f => ({ ...f, current_amount: Number(e.target.value) }))} placeholder="0" style={inputStyle} />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Statut</label>
+                      <select value={eventForm.status} onChange={e => setEventForm(f => ({ ...f, status: e.target.value as OWFEvent['status'] }))} style={inputStyle}>
+                        <option value="active">Actif</option>
+                        <option value="paused">En pause</option>
+                        <option value="completed">Terminé</option>
+                      </select>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, gridColumn: '1 / -1' }}>
+                      <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Description</label>
+                      <textarea value={eventForm.description} onChange={e => setEventForm(f => ({ ...f, description: e.target.value }))} placeholder="Décrivez l'événement..." rows={3} style={{ ...inputStyle, resize: 'vertical' }} />
+                    </div>
+
+                    {eventFormStatus === 'success' && (
+                      <div style={{ gridColumn: '1 / -1', background: '#dcfce7', border: '1px solid #86efac', borderRadius: 10, padding: '12px 16px', color: '#166534', fontWeight: 600 }}>
+                        ✓ {eventEditingId ? 'Événement modifié !' : 'Événement créé avec succès !'}
+                      </div>
+                    )}
+                    {eventFormStatus === 'error' && (
+                      <div style={{ gridColumn: '1 / -1', background: '#fee2e2', border: '1px solid #fca5a5', borderRadius: 10, padding: '12px 16px', color: '#991b1b', fontWeight: 600 }}>
+                        ✗ {eventFormError}
+                      </div>
+                    )}
+                    <div style={{ gridColumn: '1 / -1' }}>
+                      <button type="submit" disabled={eventFormStatus === 'loading'} style={{ background: eventEditingId ? 'linear-gradient(135deg,#1e3a8a,#3b82f6)' : '#c0392b', color: '#fff', border: 'none', borderRadius: 12, padding: '12px 32px', fontSize: 15, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, opacity: eventFormStatus === 'loading' ? 0.7 : 1 }}>
+                        {eventFormStatus === 'loading'
+                          ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Sauvegarde...</>
+                          : eventEditingId
+                          ? <><Pencil size={16} /> Sauvegarder les modifications</>
+                          : <><Plus size={16} /> Créer l&apos;événement</>}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                {/* Events list */}
+                <div style={{ background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 1px 6px rgba(0,0,0,0.06)' }}>
+                  <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0f1824', marginBottom: 24 }}>Événements ({events.length})</h2>
+                  {events.length === 0 ? (
+                    <p style={{ color: '#9ca3af', fontStyle: 'italic' }}>Aucun événement pour l&apos;instant. Créez-en un ci-dessus.</p>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                      {events.map(ev => {
+                        const pct = ev.target_amount > 0 ? Math.min(100, Math.round((ev.current_amount / ev.target_amount) * 100)) : 0;
+                        const isPast = new Date(ev.date) < new Date();
+                        return (
+                          <div key={ev.id} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: 16, border: '1px solid #f3f4f6', borderRadius: 14, background: isPast ? '#fafafa' : '#fff', opacity: ev.status === 'paused' ? 0.65 : 1 }}>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontWeight: 700, color: '#0f1824', fontSize: 15, marginBottom: 2 }}>{ev.title}</div>
+                              <div style={{ fontSize: 12, color: '#9ca3af', marginBottom: isPast ? 0 : 8 }}>
+                                {new Date(ev.date).toLocaleString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                {ev.location && ` · ${ev.location}`}
+                                {isPast && <span style={{ marginLeft: 8, color: '#ef4444', fontWeight: 600 }}>· Passé</span>}
+                              </div>
+                              {ev.target_amount > 0 && !isPast && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                  <div style={{ flex: 1, height: 6, background: '#f3f4f6', borderRadius: 99, overflow: 'hidden' }}>
+                                    <div style={{ height: '100%', width: `${pct}%`, background: pct >= 100 ? '#10b981' : '#c0392b', borderRadius: 99, transition: 'width 0.4s' }} />
+                                  </div>
+                                  <span style={{ fontSize: 11, fontWeight: 700, color: '#374151', flexShrink: 0 }}>{pct}%</span>
+                                </div>
+                              )}
+                            </div>
+                            {/* Status badge */}
+                            <span style={{ fontSize: 11, padding: '4px 10px', borderRadius: 20, background: ev.status === 'active' ? '#dcfce7' : ev.status === 'paused' ? '#fff7ed' : '#f3f4f6', color: ev.status === 'active' ? '#166534' : ev.status === 'paused' ? '#92400e' : '#6b7280', fontWeight: 600, flexShrink: 0 }}>
+                              {ev.status === 'active' ? 'Actif' : ev.status === 'paused' ? 'En pause' : 'Terminé'}
+                            </span>
+                            {/* Pause/Resume */}
+                            <button
+                              onClick={() => handleEventTogglePause(ev)}
+                              title={ev.status === 'active' ? 'Mettre en pause' : 'Réactiver'}
+                              style={{ background: ev.status === 'active' ? '#fff7ed' : '#dcfce7', color: ev.status === 'active' ? '#c0392b' : '#166534', border: `1px solid ${ev.status === 'active' ? '#fed7aa' : '#bbf7d0'}`, borderRadius: 10, padding: '8px 12px', cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600 }}
+                            >
+                              {ev.status === 'active' ? <><PauseCircle size={14} /> Pause</> : <><PlayCircle size={14} /> Réactiver</>}
+                            </button>
+                            {/* Edit */}
+                            <button
+                              onClick={() => handleEventEdit(ev)}
+                              style={{ background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', borderRadius: 10, padding: '8px 12px', cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600 }}
+                            >
+                              <Pencil size={14} /> Modifier
+                            </button>
+                            {/* Delete */}
+                            <button
+                              onClick={() => handleEventDelete(ev.id)}
+                              disabled={eventDeleting === ev.id}
+                              style={{ background: '#fee2e2', color: '#c0392b', border: 'none', borderRadius: 10, padding: '8px 12px', cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600 }}
+                            >
+                              {eventDeleting === ev.id ? <Loader2 size={14} /> : <Trash2 size={14} />} Supprimer
+                            </button>
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>

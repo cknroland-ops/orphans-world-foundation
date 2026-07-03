@@ -23,6 +23,7 @@ import {
   DonateModal,
   MobileMenu,
 } from "../components/Navigation";
+import { EventsWidget } from "../components/EventsWidget";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState("home");
@@ -129,6 +130,8 @@ export default function App() {
       </main>
 
       <Footer goTo={goTo} openModal={() => setIsModalOpen(true)} />
+
+      <EventsWidget openDonateModal={() => setIsModalOpen(true)} />
     </>
   );
 }

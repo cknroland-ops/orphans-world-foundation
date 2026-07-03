@@ -102,7 +102,7 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
             <div className="impact-card reveal" style={{ position: 'relative', borderRadius: '24px', overflow: 'hidden', minHeight: '320px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '32px', color: '#fff' }}>
-              <img src="https://i.ibb.co/n86NHm3t/Tracing-Turkey-s-development-aid-in-Namibia.jpg" alt="Enfants accompagnés" style={{ objectFit: 'cover', zIndex: 0, position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
+              <img src="https://i.ibb.co/n86NHm3t/Tracing-Turkey-s-development-aid-in-Namibia.jpg" alt="Enfants orphelins accompagnés par Orphans World Foundation au Sud-Kivu" style={{ objectFit: 'cover', zIndex: 0, position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)', zIndex: 1 }} />
               <div style={{ position: 'relative', zIndex: 2 }}>
                 <div data-target="200" data-suffix="+" style={{ fontSize: '48px', fontWeight: 'bold', marginBottom: '8px' }}>0</div>
@@ -111,7 +111,7 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
               </div>
             </div>
             <div className="impact-card reveal reveal-delay-1" style={{ position: 'relative', borderRadius: '24px', overflow: 'hidden', minHeight: '320px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '32px', color: '#fff' }}>
-              <img src="https://i.ibb.co/Zp5X6MPD/Say-cheese.jpg" alt="Parrainages" style={{ objectFit: 'cover', zIndex: 0, position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
+              <img src="https://i.ibb.co/Zp5X6MPD/Say-cheese.jpg" alt="Parrainage d'enfants vulnérables par les donateurs d'Orphans World Foundation" style={{ objectFit: 'cover', zIndex: 0, position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)', zIndex: 1 }} />
               <div style={{ position: 'relative', zIndex: 2 }}>
                 <div data-target="200" data-suffix="+" style={{ fontSize: '48px', fontWeight: 'bold', marginBottom: '8px' }}>0</div>
@@ -120,7 +120,7 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
               </div>
             </div>
             <div className="impact-card reveal reveal-delay-2" style={{ position: 'relative', borderRadius: '24px', overflow: 'hidden', minHeight: '320px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '32px', color: '#fff' }}>
-              <img src="https://i.ibb.co/p68tjBkB/t-l-charger.jpg" alt="Commissions" style={{ objectFit: 'cover', zIndex: 0, position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
+              <img src="https://i.ibb.co/p68tjBkB/t-l-charger.jpg" alt="Commissions actives d'Orphans World Foundation en RDC" style={{ objectFit: 'cover', zIndex: 0, position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)', zIndex: 1 }} />
               <div style={{ position: 'relative', zIndex: 2 }}>
                 <div style={{ fontSize: '48px', fontWeight: 'bold', marginBottom: '8px' }}><span data-target="6">0</span> & <span data-target="3">0</span></div>
@@ -171,7 +171,7 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
           <div className="about-3col" style={{ display: 'grid', gridTemplateColumns: '160px 1fr 1fr', gap: '40px', alignItems: 'center' }}>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <div style={{ width: '120px', height: '120px', borderRadius: '50%', overflow: 'hidden', position: 'relative', boxShadow: '0 8px 32px rgba(0,0,0,0.25)', flexShrink: 0 }}>
-                <Image src="/component_pictures/page_d_acceuil/logo.jpeg" fill alt="OWF Logo" style={{ objectFit: 'cover' }} />
+                <Image src="/component_pictures/page_d_acceuil/logo.jpeg" fill alt="Logo d'Orphans World Foundation – Organisation humanitaire pour les enfants orphelins" style={{ objectFit: 'cover' }} />
               </div>
             </div>
             <div className="about-text about-text-dark">
@@ -348,7 +348,7 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
                 </p>
               </div>
               <div className="reveal testi-img" style={{ position: 'relative', borderRadius: '24px', overflow: 'hidden', height: '400px' }}>
-                <img src="https://i.ibb.co/dCKkRRJ/Whats-App-Image-2026-06-25-at-1-59-27-PM.jpg" alt="Témoignage" style={{ objectFit: 'cover', position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
+                <img src="https://i.ibb.co/dCKkRRJ/Whats-App-Image-2026-06-25-at-1-59-27-PM.jpg" alt="Enfants soutenus par Orphans World Foundation lors d'une activité humanitaire sur le terrain" style={{ objectFit: 'cover', position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
               </div>
            </div>
         </div>
@@ -391,13 +391,13 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
           
           <div className="reveal faq-images-desktop" style={{ marginTop: '64px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
             <div style={{ borderRadius: '24px', overflow: 'hidden', height: '250px', position: 'relative' }}>
-               <img src="https://i.ibb.co/ZRJvymHq/Whats-App-Image-2026-06-25-at-1-59-29-PM.jpg" alt="FAQ image 1" style={{ objectFit: 'cover', position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
+               <img src="https://i.ibb.co/ZRJvymHq/Whats-App-Image-2026-06-25-at-1-59-29-PM.jpg" alt="Action de terrain d'Orphans World Foundation auprès des enfants orphelins" style={{ objectFit: 'cover', position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
             </div>
             <div style={{ borderRadius: '24px', overflow: 'hidden', height: '250px', position: 'relative' }}>
-               <img src="https://i.ibb.co/d4jTmjCT/Whats-App-Image-2026-06-25-at-1-59-29-PM-2.jpg" alt="FAQ image 2" style={{ objectFit: 'cover', position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
+               <img src="https://i.ibb.co/d4jTmjCT/Whats-App-Image-2026-06-25-at-1-59-29-PM-2.jpg" alt="Bénévoles et membres d'Orphans World Foundation en mission humanitaire" style={{ objectFit: 'cover', position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
             </div>
             <div style={{ borderRadius: '24px', overflow: 'hidden', height: '250px', position: 'relative' }}>
-               <img src="https://i.ibb.co/0jqjwzvh/Whats-App-Image-2026-06-25-at-1-59-29-PM-3.jpg" alt="FAQ image 3" style={{ objectFit: 'cover', position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
+               <img src="https://i.ibb.co/0jqjwzvh/Whats-App-Image-2026-06-25-at-1-59-29-PM-3.jpg" alt="Enfants soutenus par Orphans World Foundation lors d'une activité éducative" style={{ objectFit: 'cover', position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
             </div>
           </div>
         </div>
