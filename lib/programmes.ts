@@ -17,7 +17,7 @@ export const programmes: Programme[] = [
     img: "/component_pictures/programmes/sante.jpg",
     paragraphs: [
       "Chez Orphans World Foundation, nous croyons fermement que la santé est un droit fondamental, non un privilège. C'est dans cet esprit qu'est né le programme Orphans Health, une initiative entièrement dédiée au bien-être physique et mental des enfants orphelins et vulnérables que nous accompagnons dans la province du Sud-Kivu, en République Démocratique du Congo.",
-      "Le programme s'articule autour de trois axes principaux : l'accès aux soins essentiels, la prévention des troubles mentaux et le parrainage médical. Concrètement, nous facilitons les consultations médicales, les vaccinations et l'accès aux médicaments pour des enfants qui, sans notre soutien, n'auraient aucune couverture sanitaire. Chaque enfant bénéficiant d'Orphans Health est suivi par un référent médical et, lorsque la situation l'exige, par un professionnel de la santé mentale.",
+      "Promouvoir la santé des enfants par la prévention, la sensibilisation et l'éducation sanitaire, en accordant une attention particulière à la santé mentale infantile, au dépistage précoce des troubles mentaux, à l'accompagnement psychosocial ainsi qu'à la prévention des maladies et à la promotion des bonnes pratiques de santé.",
       "Dans un contexte marqué par les effets persistants des conflits armés et de la pauvreté extrême dans la région de Bukavu, les traumatismes psychologiques chez les enfants orphelins sont une réalité trop souvent ignorée. Orphans Health s'attaque à cette réalité invisible en intégrant le soutien psychologique comme composante centrale de sa prise en charge. Parce que guérir un enfant, c'est soigner à la fois son corps et son âme.",
     ],
     cta: "Souhaitez-vous soutenir ce programme ? Faites un don ou devenez parrain médical d'un enfant aujourd'hui.",
@@ -27,7 +27,7 @@ export const programmes: Programme[] = [
     badge: "ÉGALITÉ & GENRE",
     badgeColor: "gold",
     title: "Orphans Gender — Pour l'égalité, la dignité et la protection de toutes et tous",
-    img: "/component_pictures/programmes/egalite.jpeg",
+    img: "https://i.ibb.co/rBYRY05/Whats-App-Image-2026-07-05-at-00-51-16.jpg",
     paragraphs: [
       "Le programme Orphans Gender est l'expression de l'engagement profond d'Orphans World Foundation pour une société juste, équitable et respectueuse des droits de chaque enfant, quelle que soit son identité de genre. Dans une région où les inégalités entre filles et garçons persistent et où les discriminations demeurent une réalité quotidienne, notre programme s'impose comme un espace de protection, d'éducation et de transformation sociale.",
       "Nos actions concrètes comprennent des séances de sensibilisation à l'égalité de genre dans les écoles et communautés rurales de la région de Bukavu, des ateliers de formation sur les droits des filles et des garçons, ainsi qu'un programme spécifique d'éducation à l'hygiène menstruelle en milieu rural. Ce dernier volet, souvent tabou, est pourtant crucial : chaque année, des milliers de jeunes filles manquent l'école faute d'accès aux produits hygiéniques adaptés et d'informations fiables sur leur propre corps.",
@@ -40,7 +40,7 @@ export const programmes: Programme[] = [
     badge: "COMMUNICATION",
     badgeColor: "crimson",
     title: "Orphans Magazine — La voix humanitaire qui porte au-delà des frontières",
-    img: "/component_pictures/programmes/comm.jpeg",
+    img: "https://i.ibb.co/k281gRtC/Whats-App-Image-2026-07-05-at-00-49-21.jpg",
     paragraphs: [
       "Dans un monde où l'information peut sauver des vies, Orphans World Foundation a compris très tôt l'importance stratégique de la communication au service de la cause humanitaire. Le programme Orphans Magazine est bien plus qu'un simple bulletin d'information : c'est un outil de sensibilisation, de plaidoyer et de rayonnement pour l'ensemble des actions menées par l'organisation à Bukavu et au-delà.",
       "À travers des publications régulières, des reportages de terrain, des témoignages d'enfants accompagnés et des analyses de la situation humanitaire en RDC, Orphans Magazine donne une voix à ceux qui n'en ont pas. Notre équipe éditoriale produit un contenu rigoureux, accessible et profondément humain, conçu pour toucher un large public : donateurs, partenaires institutionnels, décideurs politiques et grand public national et international.",

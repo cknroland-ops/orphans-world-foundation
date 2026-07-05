@@ -16,6 +16,7 @@ const TEMOIGNAGE_DEFAULT: Temoignage = {
   role: 'Présidente commission santé',
   contenu: 'L\'engagement de la fondation envers les jeunes vulnérables est tout simplement incroyable. Nous avons vu des enfants retrouver le sourire et des familles se reconstruire avec dignité.',
   photo_url: '/component_pictures/a_propos/membres_de_l_organisation/caroline.jpeg',
+
 };
 
 export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openModal: () => void }) => {
@@ -67,11 +68,11 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
           className="hero-bg"
           style={{ transform: `translateY(${scrollY * 0.3}px) scale(1.05)` }}
         >
-          <Image src="/component_pictures/page_d_acceuil/herosection.png" alt="" fill priority style={{ objectFit: 'cover' }} />
+          <Image src="/component_pictures/page_d_acceuil/herosection.png" alt="Enfants souriants soutenus par Orphans World Foundation" fill priority style={{ objectFit: 'cover', objectPosition: 'center' }} />
         </div>
         <HeroParticles />
         <div className="hero-inner" style={{ gridTemplateColumns: '1fr' }}>
-          <div className="hero-text">
+          <div className="hero-text hero-text-fadein">
             <div className="hero-badge2">
               <span className="hero-badge2-dot"></span>
               Organisation Humanitaire · Sud-Kivu, RDC · 2023
@@ -314,7 +315,7 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
           </div>
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px' }}>
-            {blogs.slice(-3).reverse().map((blog, i) => (
+            {[...blogs].reverse().slice(0, 3).map((blog, i) => (
               <div className="reveal" key={i} style={{ borderRadius: '20px', overflow: 'hidden', background: '#fff', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
                 <div style={{ position: 'relative', height: '220px' }}>
                   <Image src={blog.img} fill alt={blog.title} style={{ objectFit: 'cover' }} referrerPolicy="no-referrer" />

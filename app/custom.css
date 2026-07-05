@@ -355,31 +355,23 @@ button { cursor: pointer; border: none; outline: none; font-family: var(--font-d
 
 /* TEAM CLASSES */
 .team-bio { font-size: 13px; color: rgba(0,0,0,0.5); line-height: 1.6; margin-top: 12px; font-family: var(--font-dmsans), 'DM Sans', sans-serif; }
-.team-card-v2 { background: rgba(255,255,255,0.85); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.6); border-radius: 20px; box-shadow: 0 10px 40px rgba(8,15,35,0.04); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1); width: 340px; flex-shrink: 0; position: relative; z-index: 2; display: flex; flex-direction: column; overflow: hidden; }
+.team-card-v2 { background: rgba(255,255,255,0.85); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.6); border-radius: 20px; box-shadow: 0 10px 40px rgba(8,15,35,0.04); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; flex-shrink: 0; position: relative; z-index: 2; display: flex; flex-direction: column; overflow: hidden; }
 .team-card-v2:hover { transform: translateY(-8px); box-shadow: 0 20px 50px rgba(8,15,35,0.1); background: #ffffff; }
 .team-card-v2 .team-avatar { width: 100%; aspect-ratio: 1; font-size: 72px; margin-bottom: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-cormorant), 'Cormorant Garamond', serif; }
 .team-card-v2 .team-info { padding: 24px; display: flex; flex-direction: column; flex: 1; }
 
-/* TEAM MARQUEE */
-.team-marquee-wrapper {
-  overflow: hidden;
-  width: 100%;
-  position: relative;
-  padding: 10px 0;
-}
-.team-marquee {
-  display: flex;
-  gap: 24px;
-  width: max-content;
-  animation: marquee 30s linear infinite;
-}
-.team-marquee:hover {
-  animation-play-state: paused;
-}
-@keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(calc(-50% - 12px)); }
-}
+/* TEAM GRID FIXE (remplace carrousel) */
+.team-grid-fixed { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+@media (max-width: 1024px) { .team-grid-fixed { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 768px) { .team-grid-fixed { grid-template-columns: 1fr; gap: 20px; } }
+
+/* HERO FADE-IN ANIMATION */
+@keyframes heroFadeInUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+.hero-text-fadein { animation: heroFadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both; }
+
+/* TEAM MARQUEE (désactivé - conservé pour compatibilité) */
+.team-marquee-wrapper { display: none; }
+.team-marquee { display: none; }
 .team-card { width: 280px; flex-shrink: 0; }
 
 /* About 3-col (Qui sommes-nous) responsive */

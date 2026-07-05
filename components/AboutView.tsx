@@ -61,7 +61,7 @@ export const AboutView = ({ openModal }: { openModal: () => void }) => {
               <div className="eyebrow eyebrow-gold">Notre vision</div>
               <h2 className="section-title-light">Opportunités et Égalité pour Tous</h2>
               <div className="divider"></div>
-              <p style={{ fontSize: 15, color: "#6B7280", lineHeight: 1.8 }}>Un monde où chaque enfant a la possibilité de vivre un avenir meilleur. Notre vision est d&apos;évoluer vers le statut d&apos;ONG pour élargir notre impact au-delà des frontières de la RDC.</p>
+              <p style={{ fontSize: 15, color: "#6B7280", lineHeight: 1.8 }}>Construire un monde où chaque enfant et chaque personne vulnérable vivent dans la dignité, jouissent pleinement de leurs droits et contribuent au développement durable de leur communauté.</p>
             </div>
           </div>
         </div>
@@ -78,47 +78,36 @@ export const AboutView = ({ openModal }: { openModal: () => void }) => {
             </div>
             <p style={{ fontSize: 15, color: "#6B7280", maxWidth: 300 }}>Un impact croissant guidé par la compassion et l&apos;engagement.</p>
           </div>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px', marginBottom: '64px' }}>
-            {[
-              { n: "BYAMUNGU Cinyunyi David", r: "Fondateur & Président du CA", init: "BCD", f: true, bio: "Juriste et lauréat d'une bourse en 'Humanitarian Community Service' en Australie, il voue sa carrière à la défense inébranlable des droits humains et à la protection de l'enfance.", img: "david.jpeg" },
-              { n: "Georges Cinyunyi", r: "Co-fondateur", init: "GC", bio: "Acteur humanitaire d'expérience avec plus de 20 ans passés au sein de la FAO (Nations Unies). Il transforme aujourd'hui ce riche parcours en un héritage puissant pour la fondation.", img: "georges.jpeg" }
-            ].map((m, i) => (
-              <div className="team-card-v2 team-card-founder reveal" key={i} style={{ width: '100%', margin: '0' }}>
-                <div className="team-avatar" style={{ background: "linear-gradient(135deg, var(--navy-deep), var(--navy-mid))", color: "#fff", position: "relative" }}>
-                  <Image src={`/component_pictures/a_propos/membres_de_l_organisation/${m.img}`} fill alt={m.n} style={{ objectFit: 'cover' }} />
-                </div>
-                <div className="team-info">
-                  <div className="team-name" style={{ color: "#000", fontWeight: 700, fontSize: 18, fontFamily: "var(--font-cormorant)" }}>{m.n}</div>
-                  <div className="team-role" style={{ color: "var(--gold)", fontSize: 12, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase", marginTop: 4 }}>{m.r}</div>
-                  <p className="team-bio" style={{ fontSize: 14 }}>{m.bio}</p>
-                </div>
+
+          {/* Intro : Fondateur uniquement */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '64px' }}>
+            <div className="team-card-v2 team-card-founder reveal" style={{ maxWidth: 420, width: '100%', margin: '0' }}>
+              <div className="team-avatar" style={{ background: "linear-gradient(135deg, var(--navy-deep), var(--navy-mid))", color: "#fff", position: "relative" }}>
+                <Image src="/component_pictures/a_propos/membres_de_l_organisation/david.jpeg" fill alt="BYAMUNGU Cinyunyi David" style={{ objectFit: 'cover' }} />
               </div>
-            ))}
+              <div className="team-info">
+                <div className="team-name" style={{ color: "#000", fontWeight: 700, fontSize: 18, fontFamily: "var(--font-cormorant)" }}>BYAMUNGU Cinyunyi David</div>
+                <div className="team-role" style={{ color: "var(--gold)", fontSize: 12, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase", marginTop: 4 }}>Fondateur & Président du CA</div>
+                <p className="team-bio" style={{ fontSize: 14 }}>Juriste et lauréat d&apos;une bourse en &apos;Humanitarian Community Service&apos; en Australie, il voue sa carrière à la défense inébranlable des droits humains et à la protection de l&apos;enfance.</p>
+              </div>
+            </div>
           </div>
-        </div>
-        
-        <div className="team-marquee-wrapper" style={{ marginTop: 20 }}>
-          <div className="team-marquee">
+
+          {/* Grille fixe : 4/ligne PC, 1/ligne mobile */}
+          <div className="team-grid-fixed reveal">
             {[
-              { n: "Evelyne Kitumaini", r: "Défenseure des Droits Humains", init: "EK", bio: "Forte d'une expérience au sein de Family First en Ouganda, elle place l'épanouissement de l'enfant au cœur de toutes les initiatives de développement.", img: "evelyne.jpeg" },
-              { n: "Nelly Walubambo", r: "Coordinatrice Régionale & Genre", init: "NW", bio: "Juriste et activiste engagée, elle préside la commission du genre et milite ardemment pour l'égalité et la stricte application des droits de l'enfant.", img: "nelly.jpeg" },
-              { n: "Mugoli Musese Caroline", r: "Présidente Commission Santé", init: "MC", bio: "Détentrice d'une licence en santé publique (UOB), elle déploie avec compassion son expertise pour garantir le bien-être sanitaire des enfants vulnérables.", img: "caroline.jpeg" },
-              { n: "Salama Bagalwa Mireille", r: "Présidente Agri-business", init: "SM", bio: "Licenciée en agro-industrie (UEA), elle allie transformation agro-alimentaire et sécurité nutritionnelle pour soutenir la santé infantile.", img: "mireille.jpeg" },
-              { n: "Josué Ntaboba Cubaka", r: "Administration", init: "JN", bio: "Titulaire d'un Master en Droit de l'UOB, il agit avec détermination pour doter l'organisation d'un cadre administratif rigoureux au service de l'action humanitaire.", img: "josue.jpeg" },
-              { n: "Murhula Maroy Pontien", r: "Activiste Humanitaire", init: "MP", bio: "Détenteur d'un Master en Droit (UOB), il participe activement et avec abnégation aux initiatives visant à secourir et protéger les plus vulnérables.", img: "pontien.jpeg" },
-              { n: "Daniella Marhegane", r: "Membre du Conseil d'Administration", init: "DM", bio: "Originaire de Bukavu, elle se distingue par sa capacité d'écoute et son efficacité redoutable dans le déploiement opérationnel des activités de terrain.", img: "daniella.jpeg" },
-              { n: "Adolphe Bahige", r: "Expert IT & Humanitaire", init: "AB", bio: "Licencié en informatique de l'Université Espoir d'Afrique. Il met la puissance du numérique au profit de l'encadrement stratégique de nos actions.", img: "adolphe.jpeg" },
-              { n: "Kangewenye Nzigire Byeby", r: "Administration", init: "KN", bio: "Passionnée et organisée, elle s'investit avec humanisme et rigueur dans la gestion quotidienne de nos missions.", img: "byeby.jpeg" },
-              { n: "Evelyne Kitumaini", r: "Défenseure des Droits Humains", init: "EK", bio: "Forte d'une expérience au sein de Family First en Ouganda, elle place l'épanouissement de l'enfant au cœur de toutes les initiatives de développement.", img: "evelyne.jpeg" },
-              { n: "Nelly Walubambo", r: "Coordinatrice Régionale & Genre", init: "NW", bio: "Juriste et activiste engagée, elle préside la commission du genre et milite ardemment pour l'égalité et la stricte application des droits de l'enfant.", img: "nelly.jpeg" },
-              { n: "Mugoli Musese Caroline", r: "Présidente Commission Santé", init: "MC", bio: "Détentrice d'une licence en santé publique (UOB), elle déploie avec compassion son expertise pour garantir le bien-être sanitaire des enfants vulnérables.", img: "caroline.jpeg" },
-              { n: "Salama Bagalwa Mireille", r: "Présidente Agri-business", init: "SM", bio: "Licenciée en agro-industrie (UEA), elle allie transformation agro-alimentaire et sécurité nutritionnelle pour soutenir la santé infantile.", img: "mireille.jpeg" },
-              { n: "Josué Ntaboba Cubaka", r: "Administration", init: "JN", bio: "Titulaire d'un Master en Droit de l'UOB, il agit avec détermination pour doter l'organisation d'un cadre administratif rigoureux au service de l'action humanitaire.", img: "josue.jpeg" },
-              { n: "Murhula Maroy Pontien", r: "Activiste Humanitaire", init: "MP", bio: "Détenteur d'un Master en Droit (UOB), il participe activement et avec abnégation aux initiatives visant à secourir et protéger les plus vulnérables.", img: "pontien.jpeg" },
-              { n: "Daniella Marhegane", r: "Membre du Conseil d'Administration", init: "DM", bio: "Originaire de Bukavu, elle se distingue par sa capacité d'écoute et son efficacité redoutable dans le déploiement opérationnel des activités de terrain.", img: "daniella.jpeg" },
-              { n: "Adolphe Bahige", r: "Expert IT & Humanitaire", init: "AB", bio: "Licencié en informatique de l'Université Espoir d'Afrique. Il met la puissance du numérique au profit de l'encadrement stratégique de nos actions.", img: "adolphe.jpeg" },
-              { n: "Kangewenye Nzigire Byeby", r: "Administration", init: "KN", bio: "Passionnée et organisée, elle s'investit avec humanisme et rigueur dans la gestion quotidienne de nos missions.", img: "byeby.jpeg" }
+              { n: "BYAMUNGU Cinyunyi David", r: "Fondateur & Président du CA", bio: "Juriste et lauréat d'une bourse en 'Humanitarian Community Service' en Australie, il voue sa carrière à la défense inébranlable des droits humains et à la protection de l'enfance.", img: "david.jpeg", gold: true },
+              { n: "Georges Cinyunyi", r: "Co-fondateur", bio: "Acteur humanitaire d'expérience avec plus de 20 ans passés au sein de la FAO (Nations Unies). Il transforme aujourd'hui ce riche parcours en un héritage puissant pour la fondation.", img: "georges.jpeg", gold: false },
+              { n: "Evelyne Kitumaini", r: "Défenseure des Droits Humains", bio: "Forte d'une expérience au sein de Family First en Ouganda, elle place l'épanouissement de l'enfant au cœur de toutes les initiatives de développement.", img: "evelyne.jpeg", gold: false },
+              { n: "Nelly Walubambo", r: "Coordinatrice Régionale & Genre", bio: "Juriste et activiste engagée, elle préside la commission du genre et milite ardemment pour l'égalité et la stricte application des droits de l'enfant.", img: "nelly.jpeg", gold: false },
+              { n: "Mugoli Musese Caroline", r: "Présidente Commission Santé", bio: "Détentrice d'une licence en santé publique (UOB), elle déploie avec compassion son expertise pour garantir le bien-être sanitaire des enfants vulnérables.", img: "caroline.jpeg", gold: false },
+              { n: "Salama Bagalwa Mireille", r: "Présidente Agri-business", bio: "Licenciée en agro-industrie (UEA), elle allie transformation agro-alimentaire et sécurité nutritionnelle pour soutenir la santé infantile.", img: "mireille.jpeg", gold: false },
+              { n: "Josué Ntaboba Cubaka", r: "Administration", bio: "Titulaire d'un Master en Droit de l'UOB, il agit avec détermination pour doter l'organisation d'un cadre administratif rigoureux au service de l'action humanitaire.", img: "josue.jpeg", gold: false },
+              { n: "Murhula Maroy Pontien", r: "Activiste Humanitaire", bio: "Détenteur d'un Master en Droit (UOB), il participe activement et avec abnégation aux initiatives visant à secourir et protéger les plus vulnérables.", img: "pontien.jpeg", gold: false },
+              { n: "Daniella Marhegane", r: "Membre du Conseil d'Administration", bio: "Originaire de Bukavu, elle se distingue par sa capacité d'écoute et son efficacité redoutable dans le déploiement opérationnel des activités de terrain.", img: "daniella.jpeg", gold: false },
+              { n: "Adolphe Bahige", r: "Expert IT & Humanitaire", bio: "Licencié en informatique de l'Université Espoir d'Afrique. Il met la puissance du numérique au profit de l'encadrement stratégique de nos actions.", img: "adolphe.jpeg", gold: false },
+              { n: "Kangewenye Nzigire Byeby", r: "Administration", bio: "Passionnée et organisée, elle s'investit avec humanisme et rigueur dans la gestion quotidienne de nos missions.", img: "byeby.jpeg", gold: false },
+              { n: "ATUMISSI LUGHOBYO AUBIN", r: "Président Commission Éducation & Droits de l'enfant", bio: "Président de la Commission Éducation, Activités humanitaires et Défense des droits de l'enfant. Titulaire d'un Master en droit de l'Université Officielle de Bukavu (UOB), il met son expertise juridique au service de la protection des droits de l'enfant et des actions humanitaires.", img: "aubin.jpeg", gold: false },
             ].map((m, i) => (
               <div className="team-card-v2" key={i}>
                 <div className="team-avatar" style={{ background: "var(--navy-primary)", color: "rgba(255,255,255,0.8)", position: "relative" }}>
@@ -126,7 +115,7 @@ export const AboutView = ({ openModal }: { openModal: () => void }) => {
                 </div>
                 <div className="team-info">
                   <div className="team-name" style={{ color: "#000", fontWeight: 700, fontSize: 16, fontFamily: "var(--font-cormorant)" }}>{m.n}</div>
-                  <div className="team-role" style={{ color: "var(--crimson)", fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase", marginTop: 4 }}>{m.r}</div>
+                  <div className="team-role" style={{ color: m.gold ? "var(--gold)" : "var(--crimson)", fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase", marginTop: 4 }}>{m.r}</div>
                   <p className="team-bio">{m.bio}</p>
                 </div>
               </div>

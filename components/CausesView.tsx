@@ -38,7 +38,7 @@ export const CausesView = ({ openModal }: { openModal: () => void }) => {
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "2px", color: "var(--gold)", textTransform: "uppercase", marginBottom: 16 }}>NOTRE VISION</div>
               <h3 style={{ fontSize: 24, fontWeight: 500, marginBottom: 16, color: "var(--navy-primary)", fontFamily: "var(--font-cormorant)", minHeight: "60px" }}>Évoluer vers un impact mondial</h3>
               <p style={{ fontSize: 15, color: "#6B7280", lineHeight: 1.7 }}>
-                Évoluer vers le statut d&apos;ONG afin d&apos;élargir notre impact humanitaire et étendre nos actions au-delà des frontières pour tous les enfants en situation difficile dans le monde.
+                Construire un monde où chaque enfant et chaque personne vulnérable vivent dans la dignité, jouissent pleinement de leurs droits et contribuent au développement durable de leur communauté.
               </p>
             </div>
             <div style={{ padding: 40, background: "var(--white)", borderRadius: 16, borderTop: "4px solid var(--crimson)", boxShadow: "0 10px 30px rgba(0,0,0,0.03)" }}>
