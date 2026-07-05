@@ -109,7 +109,7 @@ export const AboutView = ({ openModal }: { openModal: () => void }) => {
               { n: "Kangewenye Nzigire Byeby", r: "Administration", bio: "Passionnée et organisée, elle s'investit avec humanisme et rigueur dans la gestion quotidienne de nos missions.", img: "byeby.jpeg", gold: false },
               { n: "ATUMISSI LUGHOBYO AUBIN", r: "Président Commission Éducation & Droits de l'enfant", bio: "Président de la Commission Éducation, Activités humanitaires et Défense des droits de l'enfant. Titulaire d'un Master en droit de l'Université Officielle de Bukavu (UOB), il met son expertise juridique au service de la protection des droits de l'enfant et des actions humanitaires.", img: "aubin.jpeg", gold: false },
             ].map((m, i) => (
-              <div className="team-card-v2" key={i}>
+              <div className={`team-card-v2${i === 0 ? ' team-grid-founder-item' : ''}`} key={i}>
                 <div className="team-avatar" style={{ background: "var(--navy-primary)", color: "rgba(255,255,255,0.8)", position: "relative" }}>
                   <Image src={`/component_pictures/a_propos/membres_de_l_organisation/${m.img}`} fill alt={m.n} style={{ objectFit: 'cover', objectPosition: 'top' }} />
                 </div>

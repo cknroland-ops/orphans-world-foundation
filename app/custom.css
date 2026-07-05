@@ -363,7 +363,7 @@ button { cursor: pointer; border: none; outline: none; font-family: var(--font-d
 /* TEAM GRID FIXE (remplace carrousel) */
 .team-grid-fixed { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
 @media (max-width: 1024px) { .team-grid-fixed { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 768px) { .team-grid-fixed { grid-template-columns: 1fr; gap: 20px; } }
+@media (max-width: 768px) { .team-grid-fixed { grid-template-columns: 1fr; gap: 20px; } .team-grid-founder-item { display: none !important; } }
 
 /* HERO FADE-IN ANIMATION */
 @keyframes heroFadeInUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
