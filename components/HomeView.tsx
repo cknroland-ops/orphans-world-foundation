@@ -77,9 +77,9 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
               <span className="hero-badge2-dot"></span>
               Organisation Humanitaire · Sud-Kivu, RDC · 2023
             </div>
-            <h1 className="hero-headline hero-headline-fadein" style={{ color: '#CDD5DB' }}>
-              Le monde voit leur <span className="word-orphelins">vulnérabilité</span>.<br />
-              Nous voyons leur <span className="word-avenir">potentiel</span>.
+            <h1 className="hero-headline hero-headline-fadein" style={{ color: '#CDD5DB', maxWidth: '520px' }}>
+              Le monde voit<br />leur <span className="word-orphelins">vulnérabilité</span>.<br />
+              Nous voyons<br />leur <span className="word-avenir">potentiel</span>.
             </h1>
             <div className="hero-btns" style={{ justifyContent: "flex-start" }}>
               <button className="btn-primary" onClick={openModal}>❤ Faire un don</button>
@@ -218,7 +218,7 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
           </div>
           <div className="causes-grid">
             {[
-              { t: "Notre Vision", p: "Évoluer vers le statut d'ONG afin d'élargir notre impact humanitaire et étendre nos actions au-delà des frontières.", img: "/component_pictures/a_propos/image3.png" },
+              { t: "Notre Vision", p: "Construire un monde où chaque enfant et chaque personne vulnérable vivent dans la dignité, jouissent pleinement de leurs droits et contribuent au développement durable de leur communauté.", img: "/component_pictures/a_propos/image3.png" },
               { t: "Notre Mission", p: "Assurer la promotion et la protection des droits des enfants, avec une attention particulière aux enfants en situation difficile partout dans le monde.", img: "/component_pictures/a_propos/image2.png" },
               { t: "Nos Valeurs", p: "Impartialité, neutralité, respect des droits de l'enfant et absence d'appartenance politique ou religieuse.", img: "https://i.ibb.co/fYHvFv9N/Whats-App-Image-2026-06-25-at-1-59-28-PM.jpg" }
              ].map((c,i) => (
