@@ -365,9 +365,9 @@ button { cursor: pointer; border: none; outline: none; font-family: var(--font-d
 @media (max-width: 1024px) { .team-grid-fixed { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 768px) { .team-grid-fixed { grid-template-columns: 1fr; gap: 20px; } .team-grid-founder-item { display: none !important; } }
 
-/* HERO FADE-IN ANIMATION */
+/* HERO FADE-IN ANIMATION (sur le titre uniquement) */
 @keyframes heroFadeInUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
-.hero-text-fadein { animation: heroFadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both; }
+.hero-headline-fadein { animation: heroFadeInUp 1s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
 
 /* TEAM MARQUEE (désactivé - conservé pour compatibilité) */
 .team-marquee-wrapper { display: none; }

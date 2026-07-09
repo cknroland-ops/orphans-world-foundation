@@ -88,7 +88,7 @@ export const AboutView = ({ openModal }: { openModal: () => void }) => {
               <div className="team-info">
                 <div className="team-name" style={{ color: "#000", fontWeight: 700, fontSize: 18, fontFamily: "var(--font-cormorant)" }}>BYAMUNGU Cinyunyi David</div>
                 <div className="team-role" style={{ color: "var(--gold)", fontSize: 12, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase", marginTop: 4 }}>Fondateur & Président du CA</div>
-                <p className="team-bio" style={{ fontSize: 14 }}>Juriste et lauréat d&apos;une bourse en &apos;Humanitarian Community Service&apos; en Australie, il voue sa carrière à la défense inébranlable des droits humains et à la protection de l&apos;enfance.</p>
+                <p className="team-bio" style={{ fontSize: 14 }}>Titulaire d&apos;une licence en droit de l&apos;Université Officielle de Bukavu (UOB) et boursier du Gouvernement australien en Humanity Community Service, il incarne un leadership fondé sur le service, la justice et l&apos;innovation sociale. Son engagement vise à mobiliser les communautés, défendre les droits de l&apos;enfant et promouvoir des initiatives durables qui transforment durablement la vie des enfants en situation de vulnérabilité.</p>
               </div>
             </div>
           </div>
@@ -96,7 +96,7 @@ export const AboutView = ({ openModal }: { openModal: () => void }) => {
           {/* Grille fixe : 4/ligne PC, 1/ligne mobile */}
           <div className="team-grid-fixed reveal">
             {[
-              { n: "BYAMUNGU Cinyunyi David", r: "Fondateur & Président du CA", bio: "Juriste et lauréat d'une bourse en 'Humanitarian Community Service' en Australie, il voue sa carrière à la défense inébranlable des droits humains et à la protection de l'enfance.", img: "david.jpeg", gold: true },
+              { n: "BYAMUNGU Cinyunyi David", r: "Fondateur & Président du CA", bio: "Titulaire d'une licence en droit de l'Université Officielle de Bukavu (UOB) et boursier du Gouvernement australien en Humanity Community Service, il incarne un leadership fondé sur le service, la justice et l'innovation sociale. Son engagement vise à mobiliser les communautés, défendre les droits de l'enfant et promouvoir des initiatives durables qui transforment durablement la vie des enfants en situation de vulnérabilité.", img: "david.jpeg", gold: true },
               { n: "Georges Cinyunyi", r: "Co-fondateur", bio: "Acteur humanitaire d'expérience avec plus de 20 ans passés au sein de la FAO (Nations Unies). Il transforme aujourd'hui ce riche parcours en un héritage puissant pour la fondation.", img: "georges.jpeg", gold: false },
               { n: "Evelyne Kitumaini", r: "Défenseure des Droits Humains", bio: "Forte d'une expérience au sein de Family First en Ouganda, elle place l'épanouissement de l'enfant au cœur de toutes les initiatives de développement.", img: "evelyne.jpeg", gold: false },
               { n: "Nelly Walubambo", r: "Coordinatrice Régionale & Genre", bio: "Juriste et activiste engagée, elle préside la commission du genre et milite ardemment pour l'égalité et la stricte application des droits de l'enfant.", img: "nelly.jpeg", gold: false },
@@ -108,6 +108,7 @@ export const AboutView = ({ openModal }: { openModal: () => void }) => {
               { n: "Adolphe Bahige", r: "Expert IT & Humanitaire", bio: "Licencié en informatique de l'Université Espoir d'Afrique. Il met la puissance du numérique au profit de l'encadrement stratégique de nos actions.", img: "adolphe.jpeg", gold: false },
               { n: "Kangewenye Nzigire Byeby", r: "Administration", bio: "Passionnée et organisée, elle s'investit avec humanisme et rigueur dans la gestion quotidienne de nos missions.", img: "byeby.jpeg", gold: false },
               { n: "ATUMISSI LUGHOBYO AUBIN", r: "Président Commission Éducation & Droits de l'enfant", bio: "Président de la Commission Éducation, Activités humanitaires et Défense des droits de l'enfant. Titulaire d'un Master en droit de l'Université Officielle de Bukavu (UOB), il met son expertise juridique au service de la protection des droits de l'enfant et des actions humanitaires.", img: "aubin.jpeg", gold: false },
+              { n: "Rachel Nab", r: "External Relations Officer", bio: "Militante engagée dans le service communautaire, elle possède une expérience au sein d'Anglicare Australia. Passionée par l'impact social, elle met ses compétences en communication et en relations extérieures au service du développement de partenariats et de la mission de l'organisation.", img: "rachel.jpeg", gold: false },
             ].map((m, i) => (
               <div className={`team-card-v2${i === 0 ? ' team-grid-founder-item' : ''}`} key={i}>
                 <div className="team-avatar" style={{ background: "var(--navy-primary)", color: "rgba(255,255,255,0.8)", position: "relative" }}>

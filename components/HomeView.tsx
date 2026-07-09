@@ -72,14 +72,14 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
         </div>
         <HeroParticles />
         <div className="hero-inner" style={{ gridTemplateColumns: '1fr' }}>
-          <div className="hero-text hero-text-fadein">
+          <div className="hero-text">
             <div className="hero-badge2">
               <span className="hero-badge2-dot"></span>
               Organisation Humanitaire · Sud-Kivu, RDC · 2023
             </div>
-            <h1 className="hero-headline" style={{ color: '#CDD5DB' }}>
-              Le monde les<br />appelle <span className="word-orphelins">orphelins</span>,<br />
-              nous préférons<br />les appeler <span className="word-avenir">l&apos;avenir</span>.
+            <h1 className="hero-headline hero-headline-fadein" style={{ color: '#CDD5DB' }}>
+              Le monde voit leur <span className="word-orphelins">vulnérabilité</span>.<br />
+              Nous voyons leur <span className="word-avenir">potentiel</span>.
             </h1>
             <div className="hero-btns" style={{ justifyContent: "flex-start" }}>
               <button className="btn-primary" onClick={openModal}>❤ Faire un don</button>
@@ -183,7 +183,7 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
               <div className="divider reveal reveal-delay-2"></div>
               <div className="reveal reveal-delay-2">
                 <p>Fondée le <strong>15 décembre 2023</strong> à Bukavu par <strong>BYAMUNGU Cinyunyi David</strong>, Orphans World Foundation est une organisation apolitique et non confessionnelle pour la défense des droits de l&apos;enfant.</p>
-                <p>Ce qui était une initiative individuelle est devenu un projet collectif réunissant juristes, psychologues, agronomes et acteurs humanitaires engagés.</p>
+                <p>Animée par une vision d&apos;impact durable, Aujourd&apos;hui Orphans World Foundation réunit une équipe multidisciplinaire de professionnels engagés à protéger les droits des enfants, à restaurer leur dignité et à créer les conditions d&apos;un avenir où chaque enfant peut pleinement réaliser son potentiel.</p>
               </div>
               <div className="values-row reveal reveal-delay-3">
                 <span className="value-tag">Impartialité</span><span className="value-tag">Neutralité</span>
