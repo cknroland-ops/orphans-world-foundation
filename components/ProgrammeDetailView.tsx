@@ -61,7 +61,7 @@ export const ProgrammeDetailView = ({
               position: "relative",
               width: "100%",
               height: "520px",
-              borderRadius: "24px",
+              borderRadius: 0,
               overflow: "hidden",
               marginBottom: "80px",
               marginTop: "-80px",
@@ -100,7 +100,7 @@ export const ProgrammeDetailView = ({
               style={{
                 marginTop: "56px",
                 padding: "40px 48px",
-                borderRadius: "20px",
+                borderRadius: 0,
                 background: "linear-gradient(135deg, var(--navy-deep), var(--navy-primary))",
                 color: "#fff",
                 textAlign: "center",
@@ -119,7 +119,7 @@ export const ProgrammeDetailView = ({
                 &ldquo;{programme.cta}&rdquo;
               </p>
               <button
-                className="btn-primary"
+                className="btn-primary rounded-none"
                 onClick={openModal}
                 style={{ fontSize: "15px", padding: "16px 36px" }}
               >
@@ -148,7 +148,7 @@ export const ProgrammeDetailView = ({
               <div className="eyebrow eyebrow-gold">
                 <span className="eyebrow-dot"></span>Autres programmes
               </div>
-              <h2 className="section-title-light" style={{ marginBottom: 0 }}>
+              <h2 className="section-title-light uppercase" style={{ marginBottom: 0 }}>
                 Découvrez nos autres<br />initiatives
               </h2>
             </div>
@@ -167,7 +167,7 @@ export const ProgrammeDetailView = ({
                 key={i}
                 className={`reveal reveal-delay-${i + 1}`}
                 style={{
-                  borderRadius: "20px",
+                  borderRadius: 0,
                   overflow: "hidden",
                   background: "#fff",
                   boxShadow: "0 10px 30px rgba(0,0,0,0.06)",

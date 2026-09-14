@@ -223,7 +223,7 @@ export function EventsWidget({ openDonateModal }: { openDonateModal?: () => void
             onClick={e => e.stopPropagation()}
             style={{
               background: '#fff',
-              borderRadius: 24,
+              borderRadius: 0,
               width: '100%',
               maxWidth: 420,
               boxShadow: '0 32px 80px rgba(0,0,0,0.35)',
@@ -242,7 +242,7 @@ export function EventsWidget({ openDonateModal }: { openDonateModal?: () => void
                 display: 'inline-flex', alignItems: 'center', gap: 6,
                 background: 'rgba(255,255,255,0.18)', color: '#fff',
                 fontSize: 10, fontWeight: 700, padding: '4px 10px',
-                borderRadius: 20, textTransform: 'uppercase', letterSpacing: '0.7px',
+                borderRadius: 0, textTransform: 'uppercase', letterSpacing: '0.7px',
                 marginBottom: 12, backdropFilter: 'blur(4px)',
                 border: '1px solid rgba(255,255,255,0.2)',
               }}>
@@ -250,7 +250,7 @@ export function EventsWidget({ openDonateModal }: { openDonateModal?: () => void
                 Événement actif
               </span>
               {/* Title */}
-              <h3 style={{ fontSize: 20, fontWeight: 800, color: '#fff', margin: 0, lineHeight: 1.3, paddingRight: 36 }}>
+              <h3 className="uppercase" style={{ fontSize: 20, fontWeight: 800, color: '#fff', margin: 0, lineHeight: 1.3, paddingRight: 36 }}>
                 {ev.title}
               </h3>
               {/* Close button */}
@@ -325,7 +325,7 @@ export function EventsWidget({ openDonateModal }: { openDonateModal?: () => void
                 style={{
                   width: '100%', padding: '13px 0',
                   background: 'linear-gradient(135deg,#c0392b,#e74c3c)',
-                  color: '#fff', border: 'none', borderRadius: 12,
+                  color: '#fff', border: 'none', borderRadius: 0,
                   fontSize: 14, fontWeight: 700, cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                   boxShadow: '0 4px 16px rgba(192,57,43,0.35)',
@@ -349,7 +349,7 @@ export function EventsWidget({ openDonateModal }: { openDonateModal?: () => void
               }}>
                 <button
                   onClick={() => goTo('prev')}
-                  style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#374151' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: '1px solid #e5e7eb', borderRadius: 0, padding: '6px 12px', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#374151' }}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6"/></svg>
                   Précédent
@@ -373,7 +373,7 @@ export function EventsWidget({ openDonateModal }: { openDonateModal?: () => void
                 </div>
                 <button
                   onClick={() => goTo('next')}
-                  style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#374151' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: '1px solid #e5e7eb', borderRadius: 0, padding: '6px 12px', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#374151' }}
                 >
                   Suivant
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>

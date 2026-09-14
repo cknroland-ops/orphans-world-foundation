@@ -20,7 +20,7 @@ export const ProgrammesView = ({ goTo }: { goTo: (page: string) => void }) => {
         </div>
         <div className="inner-hero-content">
           <div className="inner-hero-pill">Programmes</div>
-          <h1 className="inner-hero-title">Programmes Ça<br />Marque Différence</h1>
+          <h1 className="inner-hero-title uppercase">Programmes Ça<br />Marque Différence</h1>
           <p className="inner-hero-sub">Des programmes qui élèvent les communautés par l&apos;éducation, la santé et le soutien à la vie.</p>
         </div>
       </div>
@@ -35,7 +35,7 @@ export const ProgrammesView = ({ goTo }: { goTo: (page: string) => void }) => {
                 <span className={`prog-tag-h prog-tag-${p.color}`}>{p.tag}</span>
                 <div className="prog-card-h-title">{p.title}</div>
                 <div className="prog-card-h-desc">{p.desc}</div>
-                <button className="btn-primary" style={{ padding: "10px 22px", fontSize: 13, borderRadius: 100 }} onClick={() => goTo(`programme-${p.slug}`)}>En savoir plus →</button>
+                <button className="btn-primary rounded-none" style={{ padding: "10px 22px", fontSize: 13, borderRadius: 0 }} onClick={() => goTo(`programme-${p.slug}`)}>En savoir plus →</button>
               </div>
             </div>
           ))}

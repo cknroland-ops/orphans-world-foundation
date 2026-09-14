@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '../../../lib/supabase';
+import nodemailer from 'nodemailer';
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,7 +23,50 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Erreur lors de l\'inscription.' }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true });
+    const gmailUser = process.env.GMAIL_USER?.trim();
+    const gmailAppPassword = process.env.GMAIL_APP_PASSWORD?.replace(/\s/g, '');
+    let emailSent = false;
+
+    if (gmailUser && gmailAppPassword) {
+      try {
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: { user: gmailUser, pass: gmailAppPassword },
+        });
+        const unsubscribeUrl = `${process.env.NEXT_PUBLIC_SITE_URL ?? req.nextUrl.origin}/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}`;
+
+        await transporter.sendMail({
+          from: `"Orphans World Foundation" <${gmailUser}>`,
+          to: email,
+          replyTo: gmailUser,
+          subject: 'Bienvenue dans la newsletter d’Orphans World Foundation',
+          text: `Merci pour votre inscription à la newsletter d’Orphans World Foundation. Pour vous désinscrire : ${unsubscribeUrl}`,
+          html: `
+            <div style="font-family:Arial,sans-serif;line-height:1.6;color:#0f1824">
+              <h2>Merci pour votre inscription !</h2>
+              <p>Vous recevrez désormais les nouvelles d’Orphans World Foundation et de ses actions en faveur des enfants vulnérables.</p>
+              <p style="font-size:13px;color:#6b7280">
+                Vous ne souhaitez plus recevoir nos messages ?
+                <a href="${unsubscribeUrl}" style="color:#c21b28">Se désinscrire de la newsletter</a>.
+              </p>
+            </div>
+          `,
+        });
+        emailSent = true;
+      } catch (emailError) {
+        console.error('Newsletter confirmation email failed:', emailError);
+      }
+    } else {
+      console.warn('GMAIL_USER or GMAIL_APP_PASSWORD is not configured; confirmation email skipped.');
+    }
+
+    return NextResponse.json({
+      success: true,
+      emailSent,
+      message: emailSent
+        ? 'Inscription réussie. Vérifiez votre boîte de réception et vos courriers indésirables.'
+        : 'Inscription réussie, mais le message de bienvenue n’a pas pu être envoyé.',
+    });
   } catch (err) {
     console.error('Newsletter API error:', err);
     return NextResponse.json({ error: 'Erreur serveur inattendue.' }, { status: 500 });

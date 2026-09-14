@@ -34,7 +34,7 @@ export const BlogDetailView = ({ blog, goTo }: { blog: any; goTo: (page: string)
     <div className="page active">
       <div className="bg-mesh-dark" style={{ paddingTop: "180px", paddingBottom: "100px", paddingLeft: "24px", paddingRight: "24px" }}>
         <div className="container" style={{ maxWidth: 1000, margin: "0 auto", padding: 0 }}>
-          <h1 style={{ fontSize: "clamp(48px, 7vw, 84px)", fontWeight: 700, color: "var(--white)", fontFamily: "var(--font-cormorant)", marginBottom: "24px", lineHeight: 1.05, letterSpacing: "-0.03em" }}>
+          <h1 className="uppercase" style={{ fontSize: "clamp(48px, 7vw, 84px)", fontWeight: 700, color: "var(--white)", fontFamily: "var(--font-cormorant)", marginBottom: "24px", lineHeight: 1.05, letterSpacing: "-0.03em" }}>
             {blog.title}
           </h1>
           <div style={{ fontSize: "15px", color: "rgba(255,255,255,0.6)", fontFamily: "var(--font-dmsans)", fontWeight: 500 }}>
@@ -45,7 +45,7 @@ export const BlogDetailView = ({ blog, goTo }: { blog: any; goTo: (page: string)
 
       <section className="bg-mesh-light" style={{ padding: "0 0 100px" }}>
         <div className="container" style={{ maxWidth: 1000, margin: "0 auto" }}>
-          <div className="reveal" style={{ position: "relative", width: "100%", height: "560px", borderRadius: "24px", overflow: "hidden", marginBottom: "80px", marginTop: "-120px", boxShadow: "0 20px 40px rgba(0,0,0,0.15)" }}>
+          <div className="reveal" style={{ position: "relative", width: "100%", height: "560px", borderRadius: 0, overflow: "hidden", marginBottom: "80px", marginTop: "-120px", boxShadow: "0 20px 40px rgba(0,0,0,0.15)" }}>
             <Image src={blog.img} alt={blog.title} fill style={{ objectFit: 'cover' }} referrerPolicy="no-referrer" />
           </div>
 
@@ -74,7 +74,7 @@ export const BlogDetailView = ({ blog, goTo }: { blog: any; goTo: (page: string)
           <div className="reveal" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "48px" }}>
             <div>
               <div className="eyebrow eyebrow-crimson"><span className="eyebrow-dot"></span>Blogs similaires</div>
-              <h2 className="section-title-light" style={{ marginBottom: 0 }}>Nouvelles, Voix<br />& Impact</h2>
+              <h2 className="section-title-light uppercase" style={{ marginBottom: 0 }}>Nouvelles, Voix<br />& Impact</h2>
             </div>
             <p style={{ maxWidth: 300, fontSize: "14px", color: "rgba(0,0,0,0.6)", fontFamily: "var(--font-dmsans)" }}>Explorez les mises à jour, les notes de terrain et les histoires qui illustrent notre mission et notre impact.</p>
           </div>

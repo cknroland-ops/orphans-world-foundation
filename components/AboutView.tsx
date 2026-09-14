@@ -11,7 +11,7 @@ export const AboutView = ({ openModal }: { openModal: () => void }) => {
         </div>
         <div className="inner-hero-content">
           <div className="inner-hero-pill">À propos de nous</div>
-          <h1 className="inner-hero-title">Conduite Par<br />Objectif Et Impact</h1>
+          <h1 className="inner-hero-title uppercase">Conduite Par<br />Objectif Et Impact</h1>
           <p className="inner-hero-sub">Votre soutien alimente nos missions, des communautés et de l&apos;espoir qui change la vie.</p>
         </div>
       </div>
@@ -30,7 +30,7 @@ export const AboutView = ({ openModal }: { openModal: () => void }) => {
             <div className="reveal reveal-delay-2"><div className="stat-num" data-target="1200" data-suffix="+" style={{ color: "var(--navy-primary)", fontSize: "clamp(36px, 5vw, 52px)", marginBottom: 8 }}>0</div><div style={{ fontSize: 13, color: "#6B7280" }}>Enfants reçoivent éducation</div></div>
             <div className="reveal reveal-delay-3"><div className="stat-num" data-target="62" data-suffix="+" style={{ color: "var(--navy-primary)", fontSize: "clamp(36px, 5vw, 52px)", marginBottom: 8 }}>0</div><div style={{ fontSize: 13, color: "#6B7280" }}>Vies sauvées ce mois-là</div></div>
           </div>
-          <div className="reveal" style={{ borderRadius: 20, overflow: "hidden", aspectRatio: "21/8", background: "linear-gradient(135deg,var(--navy-primary),var(--navy-mid))", position: "relative" }}>
+          <div className="reveal" style={{ borderRadius: 0, overflow: "hidden", aspectRatio: "21/8", background: "linear-gradient(135deg,var(--navy-primary),var(--navy-mid))", position: "relative" }}>
             <Image src="/component_pictures/a_propos/image1.png" fill alt="Terrain" style={{ objectFit: "cover" }} referrerPolicy="no-referrer" />
           </div>
         </div>
@@ -42,24 +42,24 @@ export const AboutView = ({ openModal }: { openModal: () => void }) => {
           <div className="about-grid reveal">
             <div className="about-text">
               <div className="eyebrow eyebrow-crimson">Notre mission</div>
-              <h2 className="section-title-light">Ensemble pour<br />l&apos;espoir durable<br />et l&apos;humanité</h2>
+              <h2 className="section-title-light uppercase">Ensemble pour<br />l&apos;espoir durable<br />et l&apos;humanité</h2>
               <div className="divider"></div>
               <p style={{ fontSize: 15, color: "#6B7280", lineHeight: 1.8, marginBottom: 16 }}>Nous nous engageons à provoquer des changements à long terme dans les communautés vulnérables, en plaçant toujours l&apos;enfant au cœur de nos priorités.</p>
               <p style={{ fontSize: 15, color: "#6B7280", lineHeight: 1.8 }}>Fondée le <strong style={{ color: "var(--navy-primary)" }}>15 décembre 2023</strong> à Bukavu, Sud-Kivu, par <strong style={{ color: "var(--navy-primary)" }}>BYAMUNGU Cinyunyi David</strong>, OWF est apolitique et non confessionnelle.</p>
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <div style={{ borderRadius: 20, overflow: "hidden", aspectRatio: "4/3", width: "100%", position: "relative", background: "linear-gradient(135deg,var(--navy-primary),var(--navy-mid))" }}>
+              <div style={{ borderRadius: 0, overflow: "hidden", aspectRatio: "4/3", width: "100%", position: "relative", background: "linear-gradient(135deg,var(--navy-primary),var(--navy-mid))" }}>
                  <Image src="/component_pictures/a_propos/image2.png" fill alt="Mission" style={{ objectFit: "cover" }} referrerPolicy="no-referrer" />
               </div>
             </div>
           </div>
           <div className="about-grid reveal" style={{ marginTop: 80 }}>
-            <div style={{ borderRadius: 20, overflow: "hidden", aspectRatio: "4/3", width: "100%", position: "relative", background: "linear-gradient(135deg,var(--navy-mid),var(--navy-primary))" }}>
+            <div style={{ borderRadius: 0, overflow: "hidden", aspectRatio: "4/3", width: "100%", position: "relative", background: "linear-gradient(135deg,var(--navy-mid),var(--navy-primary))" }}>
                <Image src="/component_pictures/a_propos/image3.png" fill alt="Vision" style={{ objectFit: "cover" }} referrerPolicy="no-referrer" />
             </div>
             <div>
               <div className="eyebrow eyebrow-gold">Notre vision</div>
-              <h2 className="section-title-light">Opportunités et Égalité pour Tous</h2>
+              <h2 className="section-title-light uppercase">Opportunités et Égalité pour Tous</h2>
               <div className="divider"></div>
               <p style={{ fontSize: 15, color: "#6B7280", lineHeight: 1.8 }}>Construire un monde où chaque enfant et chaque personne vulnérable vivent dans la dignité, jouissent pleinement de leurs droits et contribuent au développement durable de leur communauté.</p>
             </div>
@@ -74,7 +74,7 @@ export const AboutView = ({ openModal }: { openModal: () => void }) => {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 24, marginBottom: 56 }} className="reveal team-header-row">
             <div>
               <div className="eyebrow eyebrow-crimson"><span className="eyebrow-dot"></span>Notre équipe</div>
-              <h2 className="section-title-light">Notre héritage<br />en mouvement</h2>
+              <h2 className="section-title-light uppercase">Notre héritage<br />en mouvement</h2>
             </div>
             <p style={{ fontSize: 15, color: "#6B7280", maxWidth: 300 }}>Un impact croissant guidé par la compassion et l&apos;engagement.</p>
           </div>
@@ -83,7 +83,7 @@ export const AboutView = ({ openModal }: { openModal: () => void }) => {
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '64px' }}>
             <div className="team-card-v2 team-card-founder reveal" style={{ maxWidth: 420, width: '100%', margin: '0' }}>
               <div className="team-avatar" style={{ background: "linear-gradient(135deg, var(--navy-deep), var(--navy-mid))", color: "#fff", position: "relative" }}>
-                <Image src="/component_pictures/a_propos/membres_de_l_organisation/david.jpeg" fill alt="BYAMUNGU Cinyunyi David" style={{ objectFit: 'cover' }} />
+                <Image src="/component_pictures/a_propos/membres_de_l_organisation/byamungu-cinyunyi-david.jpg" fill alt="BYAMUNGU Cinyunyi David" style={{ objectFit: 'cover' }} />
               </div>
               <div className="team-info">
                 <div className="team-name" style={{ color: "#000", fontWeight: 700, fontSize: 18, fontFamily: "var(--font-cormorant)" }}>BYAMUNGU Cinyunyi David</div>
@@ -96,7 +96,7 @@ export const AboutView = ({ openModal }: { openModal: () => void }) => {
           {/* Grille fixe : 4/ligne PC, 1/ligne mobile */}
           <div className="team-grid-fixed reveal">
             {[
-              { n: "BYAMUNGU Cinyunyi David", r: "Fondateur & Président du CA", bio: "Titulaire d'une licence en droit de l'Université Officielle de Bukavu (UOB) et boursier du Gouvernement australien en Humanity Community Service, il incarne un leadership fondé sur le service, la justice et l'innovation sociale. Son engagement vise à mobiliser les communautés, défendre les droits de l'enfant et promouvoir des initiatives durables qui transforment durablement la vie des enfants en situation de vulnérabilité.", img: "david.jpeg", gold: true },
+              { n: "BYAMUNGU Cinyunyi David", r: "Fondateur & Président du CA", bio: "Titulaire d'une licence en droit de l'Université Officielle de Bukavu (UOB) et boursier du Gouvernement australien en Humanity Community Service, il incarne un leadership fondé sur le service, la justice et l'innovation sociale. Son engagement vise à mobiliser les communautés, défendre les droits de l'enfant et promouvoir des initiatives durables qui transforment durablement la vie des enfants en situation de vulnérabilité.", img: "byamungu-cinyunyi-david.jpg", gold: true },
               { n: "Georges Cinyunyi", r: "Co-fondateur", bio: "Acteur humanitaire d'expérience avec plus de 20 ans passés au sein de la FAO (Nations Unies). Il transforme aujourd'hui ce riche parcours en un héritage puissant pour la fondation.", img: "georges.jpeg", gold: false },
               { n: "Rachel Nab", r: "External Relations Officer", bio: "Militante engagée dans le service communautaire, elle possède une expérience au sein d'Anglicare Australia. Passionée par l'impact social, elle met ses compétences en communication et en relations extérieures au service du développement de partenariats et de la mission de l'organisation.", img: "rachel.jpeg", gold: false },
               { n: "Evelyne Kitumaini", r: "Défenseure des Droits Humains", bio: "Forte d'une expérience au sein de Family First en Ouganda, elle place l'épanouissement de l'enfant au cœur de toutes les initiatives de développement.", img: "evelyne.jpeg", gold: false },
@@ -129,7 +129,7 @@ export const AboutView = ({ openModal }: { openModal: () => void }) => {
         <div className="container" style={{ maxWidth: 640 }}>
           <div className="reveal">
             <div className="eyebrow eyebrow-gold" style={{ justifyContent: "center", marginBottom: 20 }}><span className="eyebrow-dot"></span>Rejoignez-nous</div>
-            <h2 className="section-title-dark" style={{ marginBottom: 20 }}>Rejoignez-nous dans ce parcours pour autonomiser les communautés.</h2>
+            <h2 className="section-title-dark uppercase" style={{ marginBottom: 20 }}>Rejoignez-nous dans ce parcours pour autonomiser les communautés.</h2>
             <button className="btn-primary" onClick={openModal} style={{ fontSize: 15, padding: "16px 36px" }}>Faites un don maintenant →</button>
           </div>
         </div>

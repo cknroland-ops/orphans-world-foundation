@@ -3,6 +3,7 @@ import Image from "next/image";
 import { HeroParticles } from "./HeroParticles";
 import { blogs } from "../lib/blogs";
 import { supabase } from "../lib/supabase";
+import { useLanguage } from "../lib/i18n";
 
 type Temoignage = {
   nom: string;
@@ -22,6 +23,13 @@ const TEMOIGNAGE_DEFAULT: Temoignage = {
 export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openModal: () => void }) => {
   const [scrollY, setScrollY] = useState(0);
   const [temoignage, setTemoignage] = useState<Temoignage>(TEMOIGNAGE_DEFAULT);
+  const { locale } = useLanguage();
+
+  const heroCopy = {
+    FR: { first: "Le monde voit leur", vulnerable: "vulnérabilité", second: "Nous voyons leur", potential: "potentiel" },
+    EN: { first: "The world sees their", vulnerable: "vulnerability", second: "We see their", potential: "potential" },
+    SW: { first: "Dunia inaona", vulnerable: "udhaifu wao", second: "Tunaona", potential: "uwezo wao" },
+  }[locale];
 
   useEffect(() => {
     const fetchTemoignage = async () => {
@@ -68,7 +76,7 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
           className="hero-bg"
           style={{ transform: `translateY(${scrollY * 0.3}px) scale(1.05)` }}
         >
-          <Image src="/component_pictures/page_d_acceuil/herosection.png" alt="Enfants souriants soutenus par Orphans World Foundation" fill priority style={{ objectFit: 'cover', objectPosition: 'center' }} />
+          <Image src="/component_pictures/page_d_acceuil/hero-section.jpeg" alt="Enfants souriants soutenus par Orphans World Foundation" fill priority style={{ objectFit: 'cover', objectPosition: 'center' }} />
         </div>
         <HeroParticles />
         <div className="hero-inner" style={{ gridTemplateColumns: '1fr' }}>
@@ -77,12 +85,14 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
               <span className="hero-badge2-dot"></span>
               Organisation Humanitaire · Sud-Kivu, RDC · 2023
             </div>
-            <h1 className="hero-headline hero-headline-fadein" style={{ color: '#CDD5DB', maxWidth: '520px' }}>
-              Le monde voit<br />leur <span className="word-orphelins">vulnérabilité</span>.<br />
-              Nous voyons<br />leur <span className="word-avenir">potentiel</span>.
+            <h1 className="hero-headline hero-headline-fadein uppercase" style={{ color: '#CDD5DB', maxWidth: '520px' }}>
+              {heroCopy.first}<br />
+              {heroCopy.vulnerable ? <><span className="word-orphelins">{heroCopy.vulnerable}</span>.</> : null}<br />
+              {heroCopy.second}<br />
+              {heroCopy.potential ? <><span className="word-avenir">{heroCopy.potential}</span>.</> : null}
             </h1>
             <div className="hero-btns" style={{ justifyContent: "flex-start" }}>
-              <button className="btn-primary" onClick={openModal}>❤ Faire un don</button>
+              <button className="btn-primary" onClick={openModal}>Faire un don</button>
               <button className="btn-outline" onClick={() => goTo("about")}>Découvrez-nous →</button>
             </div>
           </div>
@@ -98,13 +108,13 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 24, marginBottom: 56, flexWrap: "wrap" }}>
             <div>
               <div className="eyebrow eyebrow-crimson reveal"><span className="eyebrow-dot"></span>Notre impact</div>
-              <h2 className="section-title-light reveal">Ensemble pour le changement</h2>
+              <h2 className="section-title-light reveal uppercase">Ensemble pour le changement</h2>
             </div>
             <p className="reveal" style={{ maxWidth: 400, color: "var(--text-muted)", fontSize: 15, margin: 0 }}>Nourrir les familles, éduquer les enfants et reconstruire des vies, ce que notre impact montre.</p>
           </div>
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
-            <div className="impact-card reveal" style={{ position: 'relative', borderRadius: '24px', overflow: 'hidden', minHeight: '320px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '32px', color: '#fff' }}>
+            <div className="impact-card reveal" style={{ position: 'relative', borderRadius: 0, overflow: 'hidden', minHeight: '320px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '32px', color: '#fff' }}>
               <img src="https://i.ibb.co/n86NHm3t/Tracing-Turkey-s-development-aid-in-Namibia.jpg" alt="Enfants orphelins accompagnés par Orphans World Foundation au Sud-Kivu" style={{ objectFit: 'cover', zIndex: 0, position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)', zIndex: 1 }} />
               <div style={{ position: 'relative', zIndex: 2 }}>
@@ -113,7 +123,7 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
                 <div style={{ fontSize: '14px', opacity: 0.8 }}>Soutien scolaire, nutritionnel et psychosocial.</div>
               </div>
             </div>
-            <div className="impact-card reveal reveal-delay-1" style={{ position: 'relative', borderRadius: '24px', overflow: 'hidden', minHeight: '320px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '32px', color: '#fff' }}>
+            <div className="impact-card reveal reveal-delay-1" style={{ position: 'relative', borderRadius: 0, overflow: 'hidden', minHeight: '320px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '32px', color: '#fff' }}>
               <img src="https://i.ibb.co/Zp5X6MPD/Say-cheese.jpg" alt="Parrainage d'enfants vulnérables par les donateurs d'Orphans World Foundation" style={{ objectFit: 'cover', zIndex: 0, position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)', zIndex: 1 }} />
               <div style={{ position: 'relative', zIndex: 2 }}>
@@ -122,7 +132,7 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
                 <div style={{ fontSize: '14px', opacity: 0.8 }}>Les familles restaurent la sécurité et l&apos;espoir.</div>
               </div>
             </div>
-            <div className="impact-card reveal reveal-delay-2" style={{ position: 'relative', borderRadius: '24px', overflow: 'hidden', minHeight: '320px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '32px', color: '#fff' }}>
+            <div className="impact-card reveal reveal-delay-2" style={{ position: 'relative', borderRadius: 0, overflow: 'hidden', minHeight: '320px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '32px', color: '#fff' }}>
               <img src="https://i.ibb.co/p68tjBkB/t-l-charger.jpg" alt="Commissions actives d'Orphans World Foundation en RDC" style={{ objectFit: 'cover', zIndex: 0, position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)', zIndex: 1 }} />
               <div style={{ position: 'relative', zIndex: 2 }}>
@@ -150,7 +160,7 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
               ].map((p, i) => (
                 <div key={i} style={{ flex: '0 0 auto', transition: 'all 0.3s ease' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ width: '90px', height: '90px', borderRadius: '12px', overflow: 'hidden', position: 'relative', background: '#fff', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
+                    <div style={{ width: '90px', height: '90px', borderRadius: 0, overflow: 'hidden', position: 'relative', background: '#fff', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
                       <Image src={p.img} fill alt={p.name} style={{ objectFit: 'contain', padding: '6px' }} />
                     </div>
                     <span style={{ fontSize: '11px', fontWeight: '600', color: '#444', textAlign: 'center', maxWidth: '100px', lineHeight: 1.3 }}>{p.name}</span>
@@ -174,16 +184,14 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
           <div className="about-3col" style={{ display: 'grid', gridTemplateColumns: '160px 1fr 1fr', gap: '40px', alignItems: 'center' }}>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <div style={{ width: '120px', height: '120px', borderRadius: '50%', overflow: 'hidden', position: 'relative', boxShadow: '0 8px 32px rgba(0,0,0,0.25)', flexShrink: 0 }}>
-                <Image src="/component_pictures/page_d_acceuil/logo.jpeg" fill alt="Logo d'Orphans World Foundation – Organisation humanitaire pour les enfants orphelins" style={{ objectFit: 'cover' }} />
+                <Image src="/component_pictures/page_d_acceuil/logo.jpeg" fill alt="Logo d'Orphans World Foundation" style={{ objectFit: 'cover' }} />
               </div>
             </div>
             <div className="about-text about-text-dark">
               <div className="eyebrow eyebrow-gold reveal">Qui sommes-nous ?</div>
-              <h2 className="section-title-light reveal reveal-delay-1">Une initiative née<br />de l&apos;Est de la RDC</h2>
-              <div className="divider reveal reveal-delay-2"></div>
               <div className="reveal reveal-delay-2">
-                <p>Fondée le <strong>15 décembre 2023</strong> à Bukavu par <strong>BYAMUNGU Cinyunyi David</strong>, Orphans World Foundation est une organisation apolitique et non confessionnelle pour la défense des droits de l&apos;enfant.</p>
-                <p>Animée par une vision d&apos;impact durable, Aujourd&apos;hui Orphans World Foundation réunit une équipe multidisciplinaire de professionnels engagés à protéger les droits des enfants, à restaurer leur dignité et à créer les conditions d&apos;un avenir où chaque enfant peut pleinement réaliser son potentiel.</p>
+                <p>Orphans World Foundation est une organisation apolitique et non confessionnelle pour la défense des droits de l&apos;enfant, créée en République Démocratique du Congo, dans la province du Sud-Kivu, ville de Bukavu.</p>
+                <p>Animée par une vision d&apos;impact durable, aujourd&apos;hui Orphans World Foundation réunit une équipe multidisciplinaire de professionnels engagés à protéger les droits des enfants, à restaurer leur dignité et à créer les conditions d&apos;un avenir où chaque enfant peut pleinement réaliser son potentiel.</p>
               </div>
               <div className="values-row reveal reveal-delay-3">
                 <span className="value-tag">Impartialité</span><span className="value-tag">Neutralité</span>
@@ -195,9 +203,9 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
               </div>
             </div>
             <div className="about-visual reveal">
-              <div style={{ position: 'relative', width: '100%', minHeight: '450px', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
-                <Image src="/component_pictures/a_propos/membres_de_l_organisation/david.jpeg" fill alt="BYAMUNGU Cinyunyi David" style={{ objectFit: 'cover', objectPosition: 'top' }} />
-                <div style={{ position: 'absolute', bottom: 20, left: 20, background: 'rgba(255,255,255,0.95)', padding: '12px 24px', borderRadius: '12px', backdropFilter: 'blur(10px)' }}>
+              <div style={{ position: 'relative', width: '100%', minHeight: '450px', borderRadius: 0, overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
+                <Image src="/component_pictures/a_propos/membres_de_l_organisation/byamungu-cinyunyi-david.jpg" fill alt="BYAMUNGU Cinyunyi David" style={{ objectFit: 'cover', objectPosition: 'top' }} />
+                <div style={{ position: 'absolute', bottom: 20, left: 20, background: 'rgba(255,255,255,0.95)', padding: '12px 24px', borderRadius: 0, backdropFilter: 'blur(10px)' }}>
                   <strong style={{ display: 'block', color: 'var(--navy-primary)' }}>BYAMUNGU Cinyunyi David</strong>
                   <div style={{ fontSize: 14, color: 'var(--crimson)', fontWeight: '600' }}>Fondateur</div>
                 </div>
@@ -212,7 +220,7 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 24, marginBottom: 56 }}>
             <div>
               <div className="eyebrow eyebrow-crimson reveal"><span className="eyebrow-dot"></span>Causes</div>
-              <h2 className="section-title-light reveal">Causes qui inspirent</h2>
+              <h2 className="section-title-light reveal uppercase">Causes qui inspirent</h2>
             </div>
             <button className="btn-outline reveal" onClick={() => goTo("causes")} style={{ flexShrink: 0, color: "var(--navy-primary)", borderColor: "rgba(15,24,36,0.2)" }}>Voir toutes →</button>
           </div>
@@ -246,7 +254,7 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 24, marginBottom: 56 }}>
             <div>
               <div className="eyebrow eyebrow-gold reveal"><span className="eyebrow-dot"></span>Programmes</div>
-              <h2 className="section-title-light reveal">Déclenchez un<br />changement positif</h2>
+              <h2 className="section-title-light reveal uppercase">Déclenchez un<br />changement positif</h2>
             </div>
             <button className="btn-outline reveal" onClick={() => goTo("programmes")} style={{ flexShrink: 0, color: "var(--navy-primary)", borderColor: "rgba(15,24,36,0.2)" }}>Voir tous →</button>
           </div>
@@ -263,7 +271,7 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
                 <span className={`prog-tag-h prog-tag-${p.color}`}>{p.tag}</span>
                 <div className="prog-card-h-title">{p.title}</div>
                 <div className="prog-card-h-desc">{p.desc}</div>
-                <button className="btn-primary" style={{ padding: "10px 22px", fontSize: 13, borderRadius: 100 }} onClick={() => goTo(`programme-${p.slug}`)}>En savoir plus →</button>
+                <button className="btn-primary rounded-none" style={{ padding: "10px 22px", fontSize: 13, borderRadius: 0 }} onClick={() => goTo(`programme-${p.slug}`)}>En savoir plus →</button>
               </div>
             </div>
           ))}
@@ -275,7 +283,7 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 24, marginBottom: 56, flexWrap: "wrap" }}>
             <div>
               <div className="eyebrow eyebrow-crimson reveal"><span className="eyebrow-dot"></span>Comment aider</div>
-              <h2 className="section-title-dark reveal">Unis, Nous Transformons</h2>
+              <h2 className="section-title-dark reveal uppercase">Unis, Nous Transformons</h2>
             </div>
             <p className="reveal" style={{ maxWidth: 400, color: "var(--text-muted)", fontSize: 15, margin: 0 }}>Devenez un acteur du changement en soutenant nos initiatives de terrain.</p>
           </div>
@@ -287,11 +295,11 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
               { title: "Agir dans l'urgence", desc: "Rejoignez-nous lors de crises pour des aides rapides.", img: "https://i.ibb.co/xS978RVy/Why-Today-Was-Spectacular-in-an-Ordinary-Way-Nesting-Place.jpg" },
               { title: "Parrainer un enfant", desc: "Un soutien mensuel pour changer une vie entière.", img: "https://i.ibb.co/D6gFLFc/t-l-charger-2.jpg" }
             ].map((help, i) => (
-              <div className="reveal" key={i} style={{ position: 'relative', borderRadius: '24px', overflow: 'hidden', minHeight: '350px', padding: '32px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', color: '#fff' }}>
+              <div className="reveal" key={i} style={{ position: 'relative', borderRadius: 0, overflow: 'hidden', minHeight: '350px', padding: '32px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', color: '#fff' }}>
                 <img src={help.img} alt={help.title} style={{ objectFit: 'cover', zIndex: 0, position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
                 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 80%)', zIndex: 1 }} />
                 <div style={{ position: 'relative', zIndex: 2 }}>
-                  <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '8px' }}>{help.title}</h3>
+                  <h3 className="uppercase" style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '8px' }}>{help.title}</h3>
                   <p style={{ fontSize: '14px', opacity: 0.9, margin: 0 }}>{help.desc}</p>
                 </div>
               </div>
@@ -309,20 +317,20 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 24, marginBottom: 56, flexWrap: "wrap" }}>
             <div>
               <div className="eyebrow eyebrow-gold reveal"><span className="eyebrow-dot"></span>Blog</div>
-              <h2 className="section-title-light reveal">Nos Dernières Histoires</h2>
+              <h2 className="section-title-light reveal uppercase">Nos Dernières Histoires</h2>
             </div>
             <button className="btn-outline reveal" onClick={() => goTo("blog")} style={{ flexShrink: 0, color: '#000' }}>Lire tout le blog →</button>
           </div>
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px' }}>
             {[...blogs].reverse().slice(0, 3).map((blog, i) => (
-              <div className="reveal" key={i} style={{ borderRadius: '20px', overflow: 'hidden', background: '#fff', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
+              <div className="reveal" key={i} style={{ borderRadius: 0, overflow: 'hidden', background: '#fff', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
                 <div style={{ position: 'relative', height: '220px' }}>
                   <Image src={blog.img} fill alt={blog.title} style={{ objectFit: 'cover' }} referrerPolicy="no-referrer" />
                 </div>
                 <div style={{ padding: '24px' }}>
                   <div style={{ fontSize: '13px', color: 'var(--gold)', fontWeight: 600, marginBottom: '8px' }}>{blog.date}</div>
-                  <h3 style={{ fontSize: '18px', fontWeight: 'bold', margin: '0 0 16px 0', color: 'var(--navy-primary)' }}>{blog.title}</h3>
+                  <h3 className="uppercase" style={{ fontSize: '18px', fontWeight: 'bold', margin: '0 0 16px 0', color: 'var(--navy-primary)' }}>{blog.title}</h3>
                   <a onClick={() => goTo("blog")} style={{ color: 'var(--crimson)', fontWeight: 600, fontSize: '14px', cursor: 'pointer' }}>Lire l&apos;article →</a>
                 </div>
               </div>
@@ -345,12 +353,12 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
                     <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>{temoignage.role}</div>
                   </div>
                 </div>
-                <h2 className="section-title-dark" style={{ marginBottom: '24px', color: '#fff' }}>Des histoires qui redonnent espoir</h2>
+                <h2 className="section-title-dark uppercase" style={{ marginBottom: '24px', color: '#fff' }}>Des histoires qui redonnent espoir</h2>
                 <p style={{ fontSize: '20px', fontStyle: 'italic', lineHeight: 1.6, color: '#fff', marginBottom: '0' }}>
                   &quot;{temoignage.contenu}&quot;
                 </p>
               </div>
-              <div className="reveal testi-img" style={{ position: 'relative', borderRadius: '24px', overflow: 'hidden', height: '400px' }}>
+              <div className="reveal testi-img" style={{ position: 'relative', borderRadius: 0, overflow: 'hidden', height: '400px' }}>
                 <img src="https://i.ibb.co/dCKkRRJ/Whats-App-Image-2026-06-25-at-1-59-27-PM.jpg" alt="Enfants soutenus par Orphans World Foundation lors d'une activité humanitaire sur le terrain" style={{ objectFit: 'cover', position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
               </div>
            </div>
@@ -361,7 +369,7 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
         <div className="container" style={{ textAlign: "center", maxWidth: 640 }}>
           <div className="reveal">
             <div className="eyebrow eyebrow-gold" style={{ justifyContent: "center", marginBottom: 20 }}><span className="eyebrow-dot"></span>Être la raison</div>
-            <h2 className="section-title-dark" style={{ marginBottom: 20 }}>Être la raison pour laquelle<br />quelqu&apos;un <span style={{ color: "var(--gold)" }}>sourit</span>.</h2>
+            <h2 className="section-title-dark uppercase" style={{ marginBottom: 20 }}>Être la raison pour laquelle<br />quelqu&apos;un <span style={{ color: "var(--gold)" }}>sourit</span>.</h2>
             <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 16, lineHeight: 1.8, marginBottom: 36 }}>Rejoignez-nous dans ce parcours pour autonomiser les communautés et changer des vies une à la fois.</p>
             <button className="btn-primary" onClick={openModal} style={{ fontSize: 15, padding: "16px 36px" }}>Faites un don maintenant →</button>
           </div>
@@ -373,7 +381,7 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
           <div className="about-grid">
             <div className="reveal">
               <div className="eyebrow eyebrow-crimson"><span className="eyebrow-dot"></span>FAQ</div>
-              <h2 className="section-title-light">Ce que vous pensez,<br />nous y avons répondu.</h2>
+              <h2 className="section-title-light uppercase">Ce que vous pensez,<br />nous y avons répondu.</h2>
               <p style={{ fontSize: 15, color: "#6B7280", lineHeight: 1.7, marginTop: 16 }}>Trouvez des réponses utiles aux questions courantes sur le don, le bénévolat et la collecte de fonds.</p>
             </div>
             <div className="faq-list">
@@ -393,13 +401,13 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
           </div>
           
           <div className="reveal faq-images-desktop" style={{ marginTop: '64px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
-            <div style={{ borderRadius: '24px', overflow: 'hidden', height: '250px', position: 'relative' }}>
+            <div style={{ borderRadius: 0, overflow: 'hidden', height: '250px', position: 'relative' }}>
                <img src="https://i.ibb.co/ZRJvymHq/Whats-App-Image-2026-06-25-at-1-59-29-PM.jpg" alt="Action de terrain d'Orphans World Foundation auprès des enfants orphelins" style={{ objectFit: 'cover', position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
             </div>
-            <div style={{ borderRadius: '24px', overflow: 'hidden', height: '250px', position: 'relative' }}>
+            <div style={{ borderRadius: 0, overflow: 'hidden', height: '250px', position: 'relative' }}>
                <img src="https://i.ibb.co/d4jTmjCT/Whats-App-Image-2026-06-25-at-1-59-29-PM-2.jpg" alt="Bénévoles et membres d'Orphans World Foundation en mission humanitaire" style={{ objectFit: 'cover', position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
             </div>
-            <div style={{ borderRadius: '24px', overflow: 'hidden', height: '250px', position: 'relative' }}>
+            <div style={{ borderRadius: 0, overflow: 'hidden', height: '250px', position: 'relative' }}>
                <img src="https://i.ibb.co/0jqjwzvh/Whats-App-Image-2026-06-25-at-1-59-29-PM-3.jpg" alt="Enfants soutenus par Orphans World Foundation lors d'une activité éducative" style={{ objectFit: 'cover', position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
             </div>
           </div>

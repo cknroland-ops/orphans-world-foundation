@@ -25,7 +25,7 @@ export const DonateView = () => {
         </div>
         <div className="inner-hero-content">
           <div className="inner-hero-pill">Faire un don</div>
-          <h1 className="inner-hero-title">Donnez. Impact.<br />Transformer<br />Des Vies.</h1>
+          <h1 className="inner-hero-title uppercase">Donnez. Impact.<br />Transformer<br />Des Vies.</h1>
           <p className="inner-hero-sub">Votre don soutient l&apos;éducation, la santé et l&apos;aide aux situations de crise qui transforment des vies.</p>
         </div>
       </div>
@@ -34,7 +34,7 @@ export const DonateView = () => {
         <div className="container">
           <div className="about-grid" style={{ alignItems: "start" }}>
             <div className="reveal">
-              <h2 className="section-title-light" style={{ marginBottom: 36 }}>Faites un don en<br />4 étapes simples</h2>
+              <h2 className="section-title-light uppercase" style={{ marginBottom: 36 }}>Faites un don en<br />4 étapes simples</h2>
               <div>
                 <div className="step-item"><div className="step-icon">👤</div><div><div style={{ fontSize: 17, fontWeight: 600, marginBottom: 6 }}>Entrer les détails</div><div style={{ fontSize: 14, color: "#6B7280" }}>Veuillez remplir vos informations essentielles de base.</div></div><div className="step-n">1</div></div>
                 <div className="step-item"><div className="step-icon">🎯</div><div><div style={{ fontSize: 17, fontWeight: 600, marginBottom: 6 }}>Sélectionnez la cause</div><div style={{ fontSize: 14, color: "#6B7280" }}>Choisissez la cause ou le programme à soutenir.</div></div><div className="step-n">2</div></div>
@@ -75,7 +75,7 @@ export const DonateView = () => {
           <div className="about-grid">
             <div className="reveal">
               <div className="eyebrow eyebrow-crimson"><span className="eyebrow-dot"></span>FAQ</div>
-              <h2 className="section-title-light">Ce que vous pensez,<br />nous y avons répondu.</h2>
+              <h2 className="section-title-light uppercase">Ce que vous pensez,<br />nous y avons répondu.</h2>
               <p style={{ fontSize: 15, color: "#6B7280", lineHeight: 1.7, marginTop: 16 }}>Questions fréquentes sur les dons et le bénévolat.</p>
             </div>
             <div className="faq-list">

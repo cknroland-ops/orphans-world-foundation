@@ -53,7 +53,7 @@ export const BlogView = ({ goTo, setBlog }: { goTo?: (page: string) => void, set
         </div>
         <div className="inner-hero-content">
           <div className="inner-hero-pill">Blog</div>
-          <h1 className="inner-hero-title">Dernières nouvelles<br />Histoires Ça<br />Inspire Espoir</h1>
+          <h1 className="inner-hero-title uppercase">Dernières nouvelles<br />Histoires Ça<br />Inspire Espoir</h1>
           <p className="inner-hero-sub">Découvrez des mises à jour pertinentes, des moments forts de la communauté et des histoires réelles sur le terrain.</p>
         </div>
       </div>

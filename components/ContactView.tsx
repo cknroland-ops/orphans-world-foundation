@@ -64,7 +64,7 @@ export const ContactView = () => {
         </div>
         <div className="inner-hero-content">
           <div className="inner-hero-pill" style={{ color: "#f0a020" }}>Contact</div>
-          <h1 className="inner-hero-title">Portée Dehors.<br />Nous sommes<br />Tiens Toujours.</h1>
+          <h1 className="inner-hero-title uppercase">Portée Dehors.<br />Nous sommes<br />Tiens Toujours.</h1>
           <p className="inner-hero-sub">Vous avez des questions ou besoin de soutien ? Contactez-nous, nous sommes prêts à écouter.</p>
         </div>
       </div>
@@ -72,7 +72,7 @@ export const ContactView = () => {
         <div className="container">
           <div className="contact-grid">
             <div className="reveal">
-              <div style={{ borderRadius: 16, overflow: "hidden", aspectRatio: "4/3", position: "relative", marginBottom: 24, background: "linear-gradient(135deg,var(--navy-primary),var(--navy-mid))" }}>
+              <div style={{ borderRadius: 0, overflow: "hidden", aspectRatio: "4/3", position: "relative", marginBottom: 24, background: "linear-gradient(135deg,var(--navy-primary),var(--navy-mid))" }}>
                 <Image src="/component_pictures/contact/image.png" fill alt="Contact" style={{ objectFit: 'cover' }} referrerPolicy="no-referrer" />
               </div>
               <div className="ci-card" style={{ backgroundColor: "#ffffff" }}><div className="ci-icon" style={{ backgroundColor: "#f0a020", color: "#fff" }}><Mail size={20} /></div><div><div className="ci-label">NOTRE COURRIER</div><div className="ci-val"><a href="mailto:orphansworld020@gmail.com" style={{ color: "#000000", fontFamily: "Arial" }}>orphansworld020@gmail.com</a></div></div></div>
@@ -89,12 +89,12 @@ export const ContactView = () => {
                   <div className="cf-group"><label className="cf-label" style={{ color: "#000000", fontFamily: "Arial" }}>Numéro de contact</label><input className="cf-input" type="tel" placeholder="+243..." name="phone" value={formData.phone} onChange={handleInputChange} style={{ backgroundColor: "#eeeeee" }} /></div>
                   <div className="cf-group cf-full"><label className="cf-label" style={{ color: "#000000", fontFamily: "Arial" }}>Notes</label><textarea className="cf-textarea" placeholder="Travaillons ensemble !" name="notes" value={formData.notes} onChange={handleInputChange} style={{ backgroundColor: "#eeeeee" }}></textarea></div>
                   {status === 'success' && (
-                    <div className="cf-group cf-full" style={{ background: '#dcfce7', border: '1px solid #86efac', borderRadius: 10, padding: '12px 16px', color: '#166534', fontWeight: 600 }}>
+                    <div className="cf-group cf-full" style={{ background: '#dcfce7', border: '1px solid #86efac', borderRadius: 0, padding: '12px 16px', color: '#166534', fontWeight: 600 }}>
                       ✓ Votre message a bien été envoyé. Nous vous répondrons rapidement !
                     </div>
                   )}
                   {status === 'error' && (
-                    <div className="cf-group cf-full" style={{ background: '#fee2e2', border: '1px solid #fca5a5', borderRadius: 10, padding: '12px 16px', color: '#991b1b', fontWeight: 600 }}>
+                    <div className="cf-group cf-full" style={{ background: '#fee2e2', border: '1px solid #fca5a5', borderRadius: 0, padding: '12px 16px', color: '#991b1b', fontWeight: 600 }}>
                       ✗ {errorMsg}
                     </div>
                   )}
@@ -116,7 +116,7 @@ export const ContactView = () => {
           <div className="about-grid">
             <div className="reveal">
               <div className="eyebrow eyebrow-crimson"><span className="eyebrow-dot"></span>FAQ</div>
-              <h2 className="section-title-light">Ce que vous pensez,<br />nous y avons répondu.</h2>
+              <h2 className="section-title-light uppercase">Ce que vous pensez,<br />nous y avons répondu.</h2>
               <p style={{ fontSize: 15, color: "#6B7280", lineHeight: 1.7, marginTop: 16 }}>Trouvez des réponses utiles aux questions courantes.</p>
             </div>
             <div className="faq-list">

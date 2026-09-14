@@ -29,7 +29,9 @@ export const Footer = ({ goTo, openModal }: { goTo: (p: string) => void; openMod
       } else {
         setNlStatus('success');
         setEmail("");
-        setNlMsg("Inscrit avec succès !");
+        setNlMsg(data.emailSent === false
+          ? "Inscription réussie, mais le message de bienvenue n'a pas pu être envoyé. Vérifiez les courriers indésirables ou réessayez plus tard."
+          : "Inscrit avec succès ! Vérifiez aussi vos courriers indésirables.");
         setTimeout(() => setNlStatus('idle'), 5000);
       }
     } catch {
@@ -81,7 +83,7 @@ export const Footer = ({ goTo, openModal }: { goTo: (p: string) => void; openMod
             <a className="fnl" onClick={() => goTo("home")}>Accueil</a>
             <a className="fnl" onClick={() => goTo("about")}>À propos</a>
             <a className="fnl" onClick={() => goTo("causes")}>Causes</a>
-            <a className="fnl" onClick={openModal}>Faire un don</a>
+            <a className="fnl rounded-none" onClick={openModal}>Faire un don</a>
           </div>
           <div>
             <div className="footer-col-head">Autres liens</div>

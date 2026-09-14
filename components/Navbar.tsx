@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import { Globe2 } from "lucide-react";
+import { useLanguage } from "../lib/i18n";
 
 export const Navbar = ({
   currentPage,
@@ -13,6 +15,7 @@ export const Navbar = ({
   openMobileMenu: () => void;
 }) => {
   const [scrolled, setScrolled] = useState(false);
+  const { locale, setLocale, t } = useLanguage();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,11 +35,11 @@ export const Navbar = ({
         </div>
         <div className="nav-links">
           {[
-            { id: "about", label: "À propos" },
-            { id: "causes", label: "Causes" },
-            { id: "programmes", label: "Programmes" },
-            { id: "blog", label: "Blog" },
-            { id: "contact", label: "Contact" }
+            { id: "about", label: t("À propos") },
+            { id: "causes", label: t("Causes") },
+            { id: "programmes", label: t("Programmes") },
+            { id: "blog", label: t("Blog") },
+            { id: "contact", label: t("Contact") }
           ].map((page) => (
             <div
               key={page.id}
@@ -47,8 +50,16 @@ export const Navbar = ({
             </div>
           ))}
         </div>
-        <button className="nav-cta-pill" onClick={openModal}>
-          ❤ Faire un don
+        <div className="language-selector rounded-none" aria-label="Choisir la langue">
+          <Globe2 size={15} aria-hidden="true" />
+          <select value={locale} onChange={(event) => setLocale(event.target.value as "FR" | "EN" | "SW")} aria-label={t("Langue")}>
+            <option value="FR">FR</option>
+            <option value="EN">EN</option>
+            <option value="SW">SW</option>
+          </select>
+        </div>
+        <button className="nav-cta-pill rounded-none" onClick={openModal}>
+          Faire un don
         </button>
         <button className="nav-mob" onClick={openMobileMenu}>
           ☰
