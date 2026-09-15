@@ -334,7 +334,7 @@ export function EventsWidget({ openDonateModal }: { openDonateModal?: () => void
                 onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '0.9'; (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-1px)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '1'; (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)'; }}
               >
-                ❤ Soutenir cet événement
+                Soutenir cet événement
               </button>
             </div>
 

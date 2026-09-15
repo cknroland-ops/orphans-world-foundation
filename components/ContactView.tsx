@@ -68,20 +68,20 @@ export const ContactView = () => {
           <p className="inner-hero-sub">Vous avez des questions ou besoin de soutien ? Contactez-nous, nous sommes prêts à écouter.</p>
         </div>
       </div>
-      <section style={{ backgroundColor: "#EEEEEE", padding: "100px 0" }}>
+      <section className="contact-page-section" style={{ padding: "100px 0" }}>
         <div className="container">
           <div className="contact-grid">
             <div className="reveal">
               <div style={{ borderRadius: 0, overflow: "hidden", aspectRatio: "4/3", position: "relative", marginBottom: 24, background: "linear-gradient(135deg,var(--navy-primary),var(--navy-mid))" }}>
                 <Image src="/component_pictures/contact/image.png" fill alt="Contact" style={{ objectFit: 'cover' }} referrerPolicy="no-referrer" />
               </div>
-              <div className="ci-card" style={{ backgroundColor: "#ffffff" }}><div className="ci-icon" style={{ backgroundColor: "#f0a020", color: "#fff" }}><Mail size={20} /></div><div><div className="ci-label">NOTRE COURRIER</div><div className="ci-val"><a href="mailto:orphansworld020@gmail.com" style={{ color: "#000000", fontFamily: "Arial" }}>orphansworld020@gmail.com</a></div></div></div>
-              <div className="ci-card"><div className="ci-icon" style={{ backgroundColor: "#f0a020", color: "#fff" }}><Phone size={20} /></div><div><div className="ci-label">NOTRE CONTACT</div><div className="ci-val"><a href="https://wa.me/243979067087" target="_blank" rel="noreferrer" style={{ color: "#000000", fontFamily: "Arial" }}>+243 979 067 087</a></div></div></div>
-              <div className="ci-card"><div className="ci-icon" style={{ backgroundColor: "#f0a020", color: "#fff" }}><MapPin size={20} /></div><div><div className="ci-label">NOTRE ADRESSE</div><div className="ci-val" style={{ color: "#000000", fontFamily: "Arial" }}>Ave Gouverneur N°54/A, Nyalukemba<br />Bukavu · Sud-Kivu · RDC</div></div></div>
+              <div className="ci-card" style={{ backgroundColor: "#ffffff" }}><div className="ci-icon" style={{ backgroundColor: "#059669", color: "#fff" }}><Mail size={20} /></div><div><div className="ci-label">NOTRE COURRIER</div><div className="ci-val"><a href="mailto:orphansworld020@gmail.com" style={{ color: "#000000", fontFamily: "Arial" }}>orphansworld020@gmail.com</a></div></div></div>
+              <div className="ci-card"><div className="ci-icon" style={{ backgroundColor: "#059669", color: "#fff" }}><Phone size={20} /></div><div><div className="ci-label">NOTRE CONTACT</div><div className="ci-val"><a href="https://wa.me/243979067087" target="_blank" rel="noreferrer" style={{ color: "#000000", fontFamily: "Arial" }}>+243 979 067 087</a></div></div></div>
+              <div className="ci-card"><div className="ci-icon" style={{ backgroundColor: "#059669", color: "#fff" }}><MapPin size={20} /></div><div><div className="ci-label">NOTRE ADRESSE</div><div className="ci-val" style={{ color: "#000000", fontFamily: "Arial" }}>Ave Gouverneur N°54/A, Nyalukemba<br />Bukavu · Sud-Kivu · RDC</div></div></div>
             </div>
             <div className="reveal reveal-delay-1">
               <div className="contact-form-card" style={{ width: "100%", boxSizing: "border-box" }}>
-                <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 24, borderColor: "#0d0404", color: "#f0a020", fontFamily: "Arial" }}>Informations de contact</div>
+                <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 24, borderColor: "#0d0404", color: "#059669", fontFamily: "Arial" }}>Informations de contact</div>
                 <form className="cf-grid" onSubmit={handleSubmit}>
                   <div className="cf-group"><label className="cf-label" style={{ color: "#000000", fontFamily: "Arial" }}>Prénom *</label><input className="cf-input" type="text" placeholder="Jean" name="firstName" value={formData.firstName} onChange={handleInputChange} style={{ backgroundColor: "#eeeeee" }} required /></div>
                   <div className="cf-group"><label className="cf-label" style={{ color: "#000000", fontFamily: "Arial" }}>Nom de famille</label><input className="cf-input" type="text" placeholder="Dupont" name="lastName" value={formData.lastName} onChange={handleInputChange} style={{ backgroundColor: "#eeeeee" }} /></div>
@@ -99,7 +99,7 @@ export const ContactView = () => {
                     </div>
                   )}
                   <div className="cf-group cf-full">
-                    <button type="submit" className="cf-submit" disabled={status === 'loading' || status === 'success'} style={{ backgroundColor: status === 'success' ? '#4ade80' : '#f0a020', transition: 'background-color 0.3s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: status === 'loading' ? 0.8 : 1 }}>
+                    <button type="submit" className="cf-submit" disabled={status === 'loading' || status === 'success'} style={{ backgroundColor: status === 'success' ? '#4ade80' : '#059669', transition: 'background-color 0.3s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: status === 'loading' ? 0.8 : 1 }}>
                       {status === 'loading' && <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} />}
                       {status === 'loading' ? 'Envoi en cours...' : status === 'success' ? 'Message envoyé !' : 'Soumettre'}
                     </button>

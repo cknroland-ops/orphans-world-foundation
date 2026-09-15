@@ -102,6 +102,9 @@ button { cursor: pointer; border: none; outline: none; font-family: var(--font-d
     background-size: cover; background-position: center; background-attachment: fixed; mix-blend-mode: multiply;
 }
 .bg-mesh-light > * { position: relative; z-index: 1; }
+.programmes-page-section { background: linear-gradient(135deg, #f8fafc 0%, #eef7f4 52%, #fffaf0 100%); }
+.programmes-page-section::before { width: 520px; height: 520px; top: 8%; right: -180px; background: rgba(16,185,129,0.09); filter: blur(2px); }
+.programmes-page-section::after { width: 420px; height: 420px; bottom: 4%; left: -170px; background: rgba(240,160,32,0.08); }
 
 .bg-mesh-dark { position: relative; overflow: hidden; background-color: var(--navy-primary); }
 .bg-mesh-dark::before {
@@ -243,6 +246,11 @@ button { cursor: pointer; border: none; outline: none; font-family: var(--font-d
 
 /* CI CARDS */
 .ci-card { display: flex; align-items: flex-start; gap: 14px; background: #fff; border-radius: 0; padding: 18px; border: 1px solid rgba(15,24,36,0.07); margin-bottom: 12px; }
+.contact-page-section { position: relative; overflow: hidden; background: linear-gradient(135deg, #eef2f3 0%, #f7faf9 48%, #ecfdf5 100%); }
+.contact-page-section::before, .contact-page-section::after { content: ''; position: absolute; border: 1px solid rgba(5,150,105,0.12); transform: rotate(12deg); pointer-events: none; }
+.contact-page-section::before { width: 420px; height: 420px; right: -180px; top: -150px; box-shadow: 0 0 0 28px rgba(5,150,105,0.035), 0 0 0 56px rgba(240,160,32,0.035); }
+.contact-page-section::after { width: 280px; height: 280px; left: -150px; bottom: -120px; border-color: rgba(240,160,32,0.16); }
+.contact-page-section > .container { position: relative; z-index: 1; }
 .ci-icon { width: 42px; height: 42px; border-radius: 10px; background: rgba(194,27,40,0.08); font-size: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .ci-label { font-size: 11px; color: #9CA3AF; font-weight: 500; margin-bottom: 3px; font-family: var(--font-dmsans), 'DM Sans', sans-serif; letter-spacing: .5px; }
 .ci-val { font-size: 14px; font-weight: 600; color: var(--text-dark); font-family: var(--font-dmsans), 'DM Sans', sans-serif; word-break: break-word; }

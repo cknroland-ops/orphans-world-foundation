@@ -13,7 +13,7 @@ export const MobileMenu = ({ isOpen, closeMenu, goTo, openModal }: { isOpen: boo
       <a className="mob-link" onClick={() => goTo("blog")}>Blog</a>
       <a className="mob-link" onClick={() => goTo("contact")}>Contact</a>
       <button className="nav-cta-pill" style={{ marginTop: 28, fontSize: 16 }} onClick={openModal}>
-        ❤ Faire un don
+        Faire un don
       </button>
     </div>
   );

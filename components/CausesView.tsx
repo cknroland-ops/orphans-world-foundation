@@ -125,7 +125,7 @@ export const CausesView = ({ openModal }: { openModal: () => void }) => {
             Chaque jour sans votre aide est un jour de trop pour un enfant qui attend.<br />Rejoignez-nous dès aujourd&apos;hui.
           </p>
           <button className="rounded-none" onClick={openModal} style={{ background: "#fff", color: "var(--crimson)", padding: "16px 32px", borderRadius: 0, fontSize: 16, fontWeight: 600, border: "none", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8, fontFamily: "var(--font-sans)" }}>
-            ♥ Faire un don maintenant
+            Faire un don maintenant
           </button>
         </div>
       </section>

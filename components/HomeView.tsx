@@ -16,7 +16,7 @@ const TEMOIGNAGE_DEFAULT: Temoignage = {
   nom: 'Mugoli Musese Caroline',
   role: 'Présidente commission santé',
   contenu: 'L\'engagement de la fondation envers les jeunes vulnérables est tout simplement incroyable. Nous avons vu des enfants retrouver le sourire et des familles se reconstruire avec dignité.',
-  photo_url: '/component_pictures/a_propos/membres_de_l_organisation/caroline.jpeg',
+  photo_url: '/component_pictures/a_propos/membres_de_l_organisation/mugoli-musese-caroline.jpeg',
 
 };
 
@@ -41,7 +41,13 @@ export const HomeView = ({ goTo, openModal }: { goTo: (p: string) => void; openM
           .order('created_at', { ascending: false })
           .limit(1)
           .single();
-        if (data) setTemoignage(data as Temoignage);
+        if (data) {
+          const nextTemoignage = data as Temoignage;
+          if (nextTemoignage.nom.toLowerCase().includes("mugoli musese caroline")) {
+            nextTemoignage.photo_url = "/component_pictures/a_propos/membres_de_l_organisation/mugoli-musese-caroline.jpeg";
+          }
+          setTemoignage(nextTemoignage);
+        }
       } catch {
         // Fallback : on garde TEMOIGNAGE_DEFAULT déjà en place
       }

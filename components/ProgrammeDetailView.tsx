@@ -1,6 +1,8 @@
 import React from "react";
 import Image from "next/image";
 import { Programme, programmes } from "../lib/programmes";
+import { useLanguage } from "../lib/i18n";
+import { programmeTranslations } from "../lib/programmeTranslations";
 
 export const ProgrammeDetailView = ({
   programme,
@@ -11,7 +13,11 @@ export const ProgrammeDetailView = ({
   goTo: (page: string) => void;
   openModal: () => void;
 }) => {
+  const { locale, t } = useLanguage();
   if (!programme) return null;
+
+  const localized = locale === "FR" ? programme : programmeTranslations[programme.slug]?.[locale];
+  const content = localized ?? programme;
 
   const others = programmes.filter((p) => p.slug !== programme.slug).slice(0, 3);
 
@@ -25,10 +31,10 @@ export const ProgrammeDetailView = ({
               className={`prog-tag-h prog-tag-${programme.badgeColor}`}
               style={{ fontSize: "11px", letterSpacing: "2px" }}
             >
-              {programme.badge}
+              {content.badge}
             </span>
           </div>
-          <h1
+          <h1 className="uppercase"
             style={{
               fontSize: "clamp(40px, 6vw, 76px)",
               fontWeight: 700,
@@ -39,14 +45,14 @@ export const ProgrammeDetailView = ({
               letterSpacing: "-0.02em",
             }}
           >
-            {programme.title}
+            {content.title}
           </h1>
           <button
             onClick={() => goTo("programmes")}
             className="btn-outline"
             style={{ fontSize: "13px", padding: "10px 24px" }}
           >
-            ← Retour aux programmes
+            {locale === "FR" ? "← Retour aux programmes" : locale === "EN" ? "← Back to programs" : "← Rudi kwenye programu"}
           </button>
         </div>
       </div>
@@ -88,7 +94,7 @@ export const ProgrammeDetailView = ({
               lineHeight: 1.85,
             }}
           >
-            {programme.paragraphs.map((para, i) => (
+              {content.paragraphs.map((para, i) => (
               <p key={i} style={{ marginBottom: "28px" }}>
                 {para}
               </p>
@@ -116,14 +122,14 @@ export const ProgrammeDetailView = ({
                   fontFamily: "var(--font-cormorant)",
                 }}
               >
-                &ldquo;{programme.cta}&rdquo;
+                &ldquo;{content.cta}&rdquo;
               </p>
               <button
                 className="btn-primary rounded-none"
                 onClick={openModal}
                 style={{ fontSize: "15px", padding: "16px 36px" }}
               >
-                ❤ Faire un don maintenant
+                {t("Faire un don maintenant")}
               </button>
             </div>
           </div>
@@ -146,10 +152,10 @@ export const ProgrammeDetailView = ({
           >
             <div>
               <div className="eyebrow eyebrow-gold">
-                <span className="eyebrow-dot"></span>Autres programmes
+                <span className="eyebrow-dot"></span>{locale === "FR" ? "Autres programmes" : locale === "EN" ? "Other programs" : "Programu nyingine"}
               </div>
               <h2 className="section-title-light uppercase" style={{ marginBottom: 0 }}>
-                Découvrez nos autres<br />initiatives
+                {locale === "FR" ? <>Découvrez nos autres<br />initiatives</> : locale === "EN" ? <>Discover our other<br />initiatives</> : <>Gundua<br />mipango yetu mingine</>}
               </h2>
             </div>
             <button
@@ -157,7 +163,7 @@ export const ProgrammeDetailView = ({
               onClick={() => goTo("programmes")}
               style={{ flexShrink: 0, color: "var(--navy-primary)", borderColor: "rgba(15,24,36,0.2)" }}
             >
-              Voir tous les programmes →
+              {t("Voir tous les programmes →")}
             </button>
           </div>
 
@@ -184,7 +190,7 @@ export const ProgrammeDetailView = ({
                     className={`prog-tag-h prog-tag-${p.badgeColor}`}
                     style={{ fontSize: "10px", marginBottom: "12px", display: "inline-block" }}
                   >
-                    {p.badge}
+                    {locale === "FR" ? p.badge : programmeTranslations[p.slug]?.[locale]?.badge ?? p.badge}
                   </span>
                   <div
                     style={{
@@ -196,10 +202,10 @@ export const ProgrammeDetailView = ({
                       marginBottom: "12px",
                     }}
                   >
-                    {p.title.split(" — ")[0]}
+                    {locale === "FR" ? p.title.split(" — ")[0] : programmeTranslations[p.slug]?.[locale]?.title.split(" — ")[0] ?? p.title.split(" — ")[0]}
                   </div>
                   <span style={{ color: "var(--crimson)", fontWeight: 600, fontSize: "14px" }}>
-                    En savoir plus →
+                    {t("En savoir plus →")}
                   </span>
                 </div>
               </div>
