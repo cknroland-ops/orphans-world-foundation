@@ -29,7 +29,9 @@ export const Footer = ({ goTo, openModal }: { goTo: (p: string) => void; openMod
       } else {
         setNlStatus('success');
         setEmail("");
-        setNlMsg("Inscription réussie !");
+        setNlMsg(data.emailSent
+          ? "Inscription réussie ! Vérifiez votre boîte de réception (et vos courriers indésirables)."
+          : "Inscription réussie !");
         setTimeout(() => setNlStatus('idle'), 5000);
       }
     } catch {
