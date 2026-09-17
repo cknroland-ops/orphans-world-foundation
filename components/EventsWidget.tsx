@@ -57,7 +57,7 @@ function progressPct(current: number, target: number): number {
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
-export function EventsWidget({ openDonateModal }: { openDonateModal?: () => void }) {
+export function EventsWidget({ openDonateModal, eventId }: { openDonateModal?: () => void; eventId?: string | null }) {
   const [events, setEvents] = useState<OWFEvent[]>([]);
   const [open, setOpen] = useState(false);
   const [index, setIndex] = useState(0);
@@ -77,10 +77,12 @@ export function EventsWidget({ openDonateModal }: { openDonateModal?: () => void
         .gte('date', new Date().toISOString())
         .order('date', { ascending: true });
       setEvents((data as OWFEvent[]) ?? []);
+      const targetIndex = eventId ? (data ?? []).findIndex(event => event.id === eventId) : -1;
+      if (targetIndex >= 0) { setIndex(targetIndex); setOpen(true); }
       setLoaded(true);
     };
     fetch();
-  }, []);
+  }, [eventId]);
 
   // ── 2. Auto-open / auto-close cycle (only for un-dismissed events) ────────
   const startAutoOpenCycle = useCallback(() => {

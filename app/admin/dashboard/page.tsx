@@ -142,15 +142,15 @@ export default function AdminDashboard() {
     const payload = { ...eventForm, target_amount: Number(eventForm.target_amount), current_amount: Number(eventForm.current_amount) };
     const eventResult = eventEditingId
       ? await supabase.from('events').update(payload).eq('id', eventEditingId)
-      : await supabase.from('events').insert(payload).select('title, description, date, location, status').single();
+      : await supabase.from('events').insert(payload).select('id, title, description, date, location, status').single();
     const { error } = eventResult;
     if (error) { setEventFormError(error.message); setEventFormStatus('error'); }
     else {
       if (!eventEditingId && 'data' in eventResult && eventResult.data) {
-        const event = eventResult.data as { title: string; description: string; date: string; location: string; status: string };
+        const event = eventResult.data as { id: string; title: string; description: string; date: string; location: string; status: string };
         fetch('/api/newsletter/notify', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type: 'event', title: event.title, summary: event.description || `Événement prévu le ${new Date(event.date).toLocaleString('fr-FR')} à ${event.location || 'déterminer le lieu'}.`, url: `${window.location.origin}/#events` }),
+          body: JSON.stringify({ type: 'event', title: event.title, summary: event.description || `Événement prévu le ${new Date(event.date).toLocaleString('fr-FR')} à ${event.location || 'déterminer le lieu'}.`, url: `${window.location.origin}/?event=${encodeURIComponent(event.id)}` }),
         }).catch(notificationError => console.error('Event newsletter notification failed:', notificationError));
       }
       setEventFormStatus('success');
@@ -538,7 +538,7 @@ export default function AdminDashboard() {
       if (editingId && form.publie) {
         fetch('/api/newsletter/notify', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type: 'article', title: form.titre, summary: form.extrait, url: `${window.location.origin}/blog/${encodeURIComponent(form.slug || generateSlug(form.titre))}` }),
+          body: JSON.stringify({ type: 'article', title: form.titre, summary: form.extrait, url: `${window.location.origin}/?page=blog&article=${encodeURIComponent(form.slug || generateSlug(form.titre))}` }),
         }).catch(notificationError => console.error('Article newsletter notification failed:', notificationError));
       }
       setFormStatus('success');

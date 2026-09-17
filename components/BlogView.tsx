@@ -27,7 +27,7 @@ const normalise = (a: any): BlogArticle => ({
   img: a.img ?? a.image_url ?? 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&q=80&w=800',
 });
 
-export const BlogView = ({ goTo, setBlog }: { goTo?: (page: string) => void, setBlog?: (blog: any) => void }) => {
+export const BlogView = ({ goTo, setBlog, articleSlug }: { goTo?: (page: string) => void, setBlog?: (blog: any) => void, articleSlug?: string | null }) => {
   const [articles, setArticles] = useState<BlogArticle[]>([]);
   const [loaded, setLoaded] = useState(false);
 
@@ -36,10 +36,16 @@ export const BlogView = ({ goTo, setBlog }: { goTo?: (page: string) => void, set
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .then(data => {
         const list = Array.isArray(data) ? data : [];
-        setArticles(list.length > 0 ? list.map(normalise) : staticBlogs.map(normalise));
+        const nextArticles = list.length > 0 ? list.map(normalise) : staticBlogs.map(normalise);
+        setArticles(nextArticles);
+        const target = articleSlug && nextArticles.find(article => article.slug === articleSlug);
+        if (target && setBlog && goTo) { setBlog(target); goTo('blogDetail'); }
       })
       .catch(() => {
-        setArticles(staticBlogs.map(normalise));
+        const nextArticles = staticBlogs.map(normalise);
+        setArticles(nextArticles);
+        const target = articleSlug && nextArticles.find(article => article.slug === articleSlug);
+        if (target && setBlog && goTo) { setBlog(target); goTo('blogDetail'); }
       })
       .finally(() => setLoaded(true));
   }, []);

@@ -31,8 +31,16 @@ export default function App() {
   const [currentProgramme, setCurrentProgramme] = useState<Programme | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [articleSlug, setArticleSlug] = useState<string | null>(null);
+  const [eventId, setEventId] = useState<string | null>(null);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const requestedPage = params.get('page');
+    setArticleSlug(params.get('article'));
+    setEventId(params.get('event'));
+    if (requestedPage === 'blog') setCurrentPage('blog');
+
     let sid = localStorage.getItem('owf_sid');
     if (!sid) { sid = crypto.randomUUID(); localStorage.setItem('owf_sid', sid); }
     const today = new Date().toISOString().split('T')[0];
@@ -123,7 +131,7 @@ export default function App() {
         {currentPage === "causes" && <CausesView openModal={() => setIsModalOpen(true)} />}
         {currentPage === "programmes" && <ProgrammesView goTo={goTo} />}
         {currentPage === "programmeDetail" && currentProgramme && <ProgrammeDetailView programme={currentProgramme} goTo={goTo} openModal={() => setIsModalOpen(true)} />}
-        {currentPage === "blog" && <BlogView goTo={goTo} setBlog={setCurrentBlog} />}
+        {currentPage === "blog" && <BlogView goTo={goTo} setBlog={setCurrentBlog} articleSlug={articleSlug} />}
         {currentPage === "blogDetail" && <BlogDetailView blog={currentBlog} goTo={goTo} />}
         {currentPage === "contact" && <ContactView />}
         {currentPage === "donate" && <DonateView />}
@@ -131,7 +139,7 @@ export default function App() {
 
       <Footer goTo={goTo} openModal={() => setIsModalOpen(true)} />
 
-      <EventsWidget openDonateModal={() => setIsModalOpen(true)} />
+      <EventsWidget openDonateModal={() => setIsModalOpen(true)} eventId={eventId} />
     </>
   );
 }

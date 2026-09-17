@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (article.publie) {
-      try { await notifyNewsletterSubscribers({ subject: `Nouvel article : ${article.titre}`, title: article.titre, summary: article.extrait, url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://orphansworldfoundation.org'}/blog/${encodeURIComponent(article.slug)}`, cta: "Lire l'article" }); }
+      try { await notifyNewsletterSubscribers({ subject: `Nouvel article : ${article.titre}`, title: article.titre, summary: article.extrait, url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://orphansworldfoundation.org'}/?page=blog&article=${encodeURIComponent(article.slug)}`, cta: "Lire l'article" }); }
       catch (notificationError) { console.error('[API /articles] Notification error:', notificationError); }
     }
     return NextResponse.json({ success: true, article });
