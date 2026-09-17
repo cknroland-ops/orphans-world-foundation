@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Cet email est déjà inscrit à la newsletter.' }, { status: 409 });
       }
       console.error('Supabase newsletter error:', error);
-      return NextResponse.json({ error: 'Erreur lors de l\'inscription.' }, { status: 500 });
+      return NextResponse.json({ error: "Erreur lors de l'inscription." }, { status: 500 });
     }
 
     const gmailUser = process.env.GMAIL_USER?.trim();
@@ -33,7 +33,9 @@ export async function POST(req: NextRequest) {
           service: 'gmail',
           auth: { user: gmailUser, pass: gmailAppPassword },
         });
-        const unsubscribeUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://orphansworldfoundation.org'}/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}`;
+
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://orphansworldfoundation.org';
+        const unsubscribeUrl = `${baseUrl}/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}`;
 
         await transporter.sendMail({
           from: gmailUser,
