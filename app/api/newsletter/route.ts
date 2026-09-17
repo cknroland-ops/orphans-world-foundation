@@ -33,10 +33,10 @@ export async function POST(req: NextRequest) {
           service: 'gmail',
           auth: { user: gmailUser, pass: gmailAppPassword },
         });
-        const unsubscribeUrl = `${process.env.NEXT_PUBLIC_SITE_URL ?? req.nextUrl.origin}/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}`;
+        const unsubscribeUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://orphansworldfoundation.org'}/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}`;
 
         await transporter.sendMail({
-          from: `"Orphans World Foundation" <${gmailUser}>`,
+          from: gmailUser,
           to: email,
           replyTo: gmailUser,
           subject: 'Bienvenue dans la newsletter d’Orphans World Foundation',

@@ -441,9 +441,14 @@ export default function AdminDashboard() {
     };
     if (form.contenu) payload.contenu = form.contenu;
 
-    const { error } = editingId
+    const result = editingId
       ? await supabase.from('articles').update(payload).eq('id', editingId)
-      : await supabase.from('articles').insert(payload);
+      : await fetch('/api/articles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }).then(async response => ({ error: response.ok ? null : { message: (await response.json()).error || 'Erreur lors de la publication.' } }));
+    const { error } = result;
 
     if (error) {
       setFormError(error.message);

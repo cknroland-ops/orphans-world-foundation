@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
         });
 
         await transporter.sendMail({
-          from: `"OWF Contact" <${gmailUser}>`,
+          from: gmailUser,
           to: 'orphansworld020@gmail.com',
           subject: `Nouveau message de ${nom}`,
           html: `
