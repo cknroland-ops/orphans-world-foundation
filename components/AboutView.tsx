@@ -1,7 +1,18 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import { createBrowserClient } from '@supabase/ssr';
+import { DEFAULT_TEAM_MEMBERS, TeamMember } from '../lib/team';
 
 export const AboutView = ({ openModal }: { openModal: () => void }) => {
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(DEFAULT_TEAM_MEMBERS);
+
+  useEffect(() => {
+    const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+    supabase.from('membres_equipe').select('*').eq('actif', true).order('ordre', { ascending: true }).order('created_at', { ascending: true })
+      .then(({ data }) => { if (data?.length) setTeamMembers(data as TeamMember[]); });
+  }, []);
+
+  const founder = teamMembers[0] ?? DEFAULT_TEAM_MEMBERS[0];
   return (
     <div className="page active">
       <div className="inner-hero">
@@ -31,7 +42,7 @@ export const AboutView = ({ openModal }: { openModal: () => void }) => {
             <div className="reveal reveal-delay-3"><div className="stat-num" data-target="62" data-suffix="+" style={{ color: "var(--navy-primary)", fontSize: "clamp(36px, 5vw, 52px)", marginBottom: 8 }}>0</div><div style={{ fontSize: 13, color: "#6B7280" }}>Vies sauvées ce mois-là</div></div>
           </div>
           <div className="reveal" style={{ borderRadius: 0, overflow: "hidden", aspectRatio: "21/8", background: "linear-gradient(135deg,var(--navy-primary),var(--navy-mid))", position: "relative" }}>
-            <Image src="/component_pictures/a_propos/image1.png" fill alt="Terrain" style={{ objectFit: "cover" }} referrerPolicy="no-referrer" />
+            <Image src="/component_pictures/a_propos/image1.jpeg" fill alt="Terrain" style={{ objectFit: "cover" }} referrerPolicy="no-referrer" />
           </div>
         </div>
       </section>
@@ -83,36 +94,22 @@ export const AboutView = ({ openModal }: { openModal: () => void }) => {
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '64px' }}>
             <div className="team-card-v2 team-card-founder reveal" style={{ maxWidth: 420, width: '100%', margin: '0' }}>
               <div className="team-avatar" style={{ background: "linear-gradient(135deg, var(--navy-deep), var(--navy-mid))", color: "#fff", position: "relative" }}>
-                <Image src="/component_pictures/a_propos/membres_de_l_organisation/byamungu-cinyunyi-david.jpg" fill alt="BYAMUNGU Cinyunyi David" style={{ objectFit: 'cover' }} />
+                <Image src={founder.photo_url} fill alt={founder.nom} style={{ objectFit: 'cover' }} />
               </div>
               <div className="team-info">
-                <div className="team-name" style={{ color: "#000", fontWeight: 700, fontSize: 18, fontFamily: "var(--font-cormorant)" }}>BYAMUNGU Cinyunyi David</div>
-                <div className="team-role" style={{ color: "var(--gold)", fontSize: 12, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase", marginTop: 4 }}>Fondateur & Président du CA</div>
-                <p className="team-bio" style={{ fontSize: 14 }}>Titulaire d&apos;une licence en droit de l&apos;Université Officielle de Bukavu (UOB) et boursier du Gouvernement australien en Humanity Community Service, il incarne un leadership fondé sur le service, la justice et l&apos;innovation sociale. Son engagement vise à mobiliser les communautés, défendre les droits de l&apos;enfant et promouvoir des initiatives durables qui transforment durablement la vie des enfants en situation de vulnérabilité.</p>
+                <div className="team-name" style={{ color: "#000", fontWeight: 700, fontSize: 18, fontFamily: "var(--font-cormorant)" }}>{founder.nom}</div>
+                <div className="team-role" style={{ color: "var(--gold)", fontSize: 12, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase", marginTop: 4 }}>{founder.poste}</div>
+                <p className="team-bio" style={{ fontSize: 14 }}>{founder.bio}</p>
               </div>
             </div>
           </div>
 
           {/* Grille fixe : 4/ligne PC, 1/ligne mobile */}
           <div className="team-grid-fixed reveal">
-            {[
-              { n: "BYAMUNGU Cinyunyi David", r: "Fondateur & Président du CA", bio: "Titulaire d'une licence en droit de l'Université Officielle de Bukavu (UOB) et boursier du Gouvernement australien en Humanity Community Service, il incarne un leadership fondé sur le service, la justice et l'innovation sociale. Son engagement vise à mobiliser les communautés, défendre les droits de l'enfant et promouvoir des initiatives durables qui transforment durablement la vie des enfants en situation de vulnérabilité.", img: "byamungu-cinyunyi-david.jpg", gold: true },
-              { n: "Georges Cinyunyi", r: "Co-fondateur", bio: "Acteur humanitaire d'expérience avec plus de 20 ans passés au sein de la FAO (Nations Unies). Il transforme aujourd'hui ce riche parcours en un héritage puissant pour la fondation.", img: "georges.jpeg", gold: false },
-              { n: "Rachel Nab", r: "External Relations Officer", bio: "Militante engagée dans le service communautaire, elle possède une expérience au sein d'Anglicare Australia. Passionée par l'impact social, elle met ses compétences en communication et en relations extérieures au service du développement de partenariats et de la mission de l'organisation.", img: "rachel.jpeg", gold: false },
-              { n: "Evelyne Kitumaini", r: "Défenseure des Droits Humains", bio: "Forte d'une expérience au sein de Family First en Ouganda, elle place l'épanouissement de l'enfant au cœur de toutes les initiatives de développement.", img: "evelyne.jpeg", gold: false },
-              { n: "Nelly Walubambo", r: "Coordinatrice Régionale & Genre", bio: "Juriste et activiste engagée, elle préside la commission du genre et milite ardemment pour l'égalité et la stricte application des droits de l'enfant.", img: "nelly.jpeg", gold: false },
-              { n: "Mugoli Musese Caroline", r: "Présidente Commission Santé", bio: "Détentrice d'une licence en santé publique (UOB), elle déploie avec compassion son expertise pour garantir le bien-être sanitaire des enfants vulnérables.", img: "mugoli-musese-caroline.jpeg", gold: false },
-              { n: "Salama Bagalwa Mireille", r: "Présidente Agri-business", bio: "Licenciée en agro-industrie (UEA), elle allie transformation agro-alimentaire et sécurité nutritionnelle pour soutenir la santé infantile.", img: "mireille.jpeg", gold: false },
-              { n: "Murhula Maroy Pontien", r: "Activiste Humanitaire", bio: "Détenteur d'un Master en Droit (UOB), il participe activement et avec abnégation aux initiatives visant à secourir et protéger les plus vulnérables.", img: "pontien.jpeg", gold: false },
-              { n: "Daniella Marhegane", r: "Membre du Conseil d'Administration", bio: "Originaire de Bukavu, elle se distingue par sa capacité d'écoute et son efficacité redoutable dans le déploiement opérationnel des activités de terrain.", img: "daniella.jpeg", gold: false },
-              { n: "Adolphe Bahige", r: "Expert IT & Humanitaire", bio: "Licencié en informatique de l'Université Espoir d'Afrique. Il met la puissance du numérique au profit de l'encadrement stratégique de nos actions.", img: "adolphe.jpeg", gold: false },
-              { n: "Kangewenye Nzigire Byeby", r: "Administration", bio: "Passionnée et organisée, elle s'investit avec humanisme et rigueur dans la gestion quotidienne de nos missions.", img: "byeby.jpeg", gold: false },
-              { n: "ATUMISSI LUGHOBYO AUBIN", r: "Président Commission Éducation & Droits de l'enfant", bio: "Président de la Commission Éducation, Activités humanitaires et Défense des droits de l'enfant. Titulaire d'un Master en droit de l'Université Officielle de Bukavu (UOB), il met son expertise juridique au service de la protection des droits de l'enfant et des actions humanitaires.", img: "aubin.jpeg", gold: false },
-              { n: "IRENGE RUSABUNGA Eric", r: "Responsable commission de justice", bio: "Chercheur en droit à l’université officielle de Bukavu, il incarne l’expertise, la rigueur et l’engagement pour la justice et œuvre à la promotion des droits de l'enfant et au renforcement de la protection juridique au sein de l’organisation.", img: "irenge.jpeg", gold: false },
-            ].map((m, i) => (
+            {teamMembers.map((m, i) => ({ n: m.nom, r: m.poste, bio: m.bio, img: m.photo_url, gold: i === 0 })).map((m, i) => (
               <div className={`team-card-v2${i === 0 ? ' team-grid-founder-item' : ''}`} key={i}>
                 <div className="team-avatar" style={{ background: "var(--navy-primary)", color: "rgba(255,255,255,0.8)", position: "relative" }}>
-                  <Image src={`/component_pictures/a_propos/membres_de_l_organisation/${m.img}`} fill alt={m.n} style={{ objectFit: 'cover', objectPosition: 'top' }} />
+                  <Image src={m.img} fill alt={m.n} style={{ objectFit: 'cover', objectPosition: 'top' }} />
                 </div>
                 <div className="team-info">
                   <div className="team-name" style={{ color: "#000", fontWeight: 700, fontSize: 16, fontFamily: "var(--font-cormorant)" }}>{m.n}</div>

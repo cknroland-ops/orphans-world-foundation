@@ -60,9 +60,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       emailSent,
-      message: emailSent
-        ? 'Inscription réussie. Vérifiez votre boîte de réception et vos courriers indésirables.'
-        : "Inscription réussie, mais le message de bienvenue n’a pas pu être envoyé.",
+      message: 'Inscription réussie.',
     });
   } catch (err) {
     console.error('Newsletter API error:', err);

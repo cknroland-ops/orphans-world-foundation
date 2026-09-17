@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
 import { FileText, LogOut, Plus, Trash2, BarChart2, Loader2, Upload, Database, Users, MessageCircle, Mail, Eye, Shield, KeyRound, CheckCircle2, Pencil, X, Download, Phone, Menu, CalendarDays, PauseCircle, PlayCircle } from 'lucide-react';
 import { RichTextEditor } from '../../../components/RichTextEditor';
+import { DEFAULT_TEAM_MEMBERS, TeamMember } from '../../../lib/team';
 
 type Article = {
   id: string;
@@ -41,6 +42,8 @@ type NewsletterEmail = {
   created_at: string;
 };
 
+type AdminTeamMember = TeamMember & { id: string; created_at: string };
+
 type Benevole = {
   id: string;
   nom: string;
@@ -72,11 +75,12 @@ const STORAGE_BUCKET = 'articles-images';
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const [tab, setTab] = useState<'stats' | 'blog' | 'security' | 'messages' | 'events'>('stats');
+  const [tab, setTab] = useState<'stats' | 'blog' | 'security' | 'messages' | 'events' | 'team'>('stats');
   const [stats, setStats] = useState<Stats>({ newsletter: 0, contacts: 0, visitesToday: 0, visitesTotal: 0 });
   const [articles, setArticles] = useState<Article[]>([]);
   const [contacts, setContacts] = useState<ContactMessage[]>([]);
   const [newsletterEmails, setNewsletterEmails] = useState<NewsletterEmail[]>([]);
+  const [teamMembers, setTeamMembers] = useState<AdminTeamMember[]>([]);
   const [benevoles, setBenevoles] = useState<Benevole[]>([]);
   const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
   const [selectedBenevole, setSelectedBenevole] = useState<Benevole | null>(null);
@@ -105,6 +109,14 @@ export default function AdminDashboard() {
   const [eventDeleting, setEventDeleting] = useState<string | null>(null);
   const [contactDeleting, setContactDeleting] = useState<string | null>(null);
   const [benevoleDeleting, setBenevoleDeleting] = useState<string | null>(null);
+  const [newsletterDeleting, setNewsletterDeleting] = useState<string | null>(null);
+  const [memberForm, setMemberForm] = useState({ nom: '', poste: '', bio: '', photo_url: '', ordre: 0, actif: true });
+  const [memberEditingId, setMemberEditingId] = useState<string | null>(null);
+  const [memberImageFile, setMemberImageFile] = useState<File | null>(null);
+  const [memberImagePreview, setMemberImagePreview] = useState('');
+  const [memberFormStatus, setMemberFormStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [memberFormError, setMemberFormError] = useState('');
+  const [memberDeleting, setMemberDeleting] = useState<string | null>(null);
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -181,6 +193,15 @@ export default function AdminDashboard() {
     setBenevoles(benevolesRes.data ?? []);
   }, [supabase]);
 
+  const loadMembers = useCallback(async () => {
+    const { data, error } = await supabase.from('membres_equipe').select('*').order('ordre', { ascending: true }).order('created_at', { ascending: true });
+    if (!error && data?.length) setTeamMembers(data as AdminTeamMember[]);
+    else if (!error && !data?.length) {
+      const { data: seeded } = await supabase.from('membres_equipe').insert(DEFAULT_TEAM_MEMBERS).select('*');
+      setTeamMembers((seeded as AdminTeamMember[]) ?? []);
+    } else setTeamMembers([]);
+  }, [supabase]);
+
   const loadData = useCallback(async () => {
     setLoadingData(true);
     const [newsletterRes, contactsRes, articlesRes, visitesTodayRes, visitesTotalRes] = await Promise.all([
@@ -223,6 +244,54 @@ export default function AdminDashboard() {
     await supabase.from('benevoles').delete().eq('id', id);
     setSelectedBenevole(null);
     await loadMessages();
+  };
+
+  const deleteNewsletter = async (id: string, email: string) => {
+    if (!confirm(`Désinscrire ${email} de la newsletter ? Cette action supprimera aussi son email de la base de données.`)) return;
+    setNewsletterDeleting(id);
+    const { error } = await supabase.from('newsletter').delete().eq('id', id);
+    if (error) alert(`Impossible de supprimer cette inscription : ${error.message}`);
+    else {
+      setNewsletterEmails(prev => prev.filter(item => item.id !== id));
+      setStats(prev => ({ ...prev, newsletter: Math.max(0, prev.newsletter - 1) }));
+    }
+    setNewsletterDeleting(null);
+  };
+
+  const uploadMemberImage = async (file: File) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    const res = await fetch('/api/upload-image', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (!res.ok || !data.url) throw new Error(data.error || "Échec du téléversement de l'image.");
+    return data.url as string;
+  };
+
+  const handleMemberSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!memberForm.nom.trim()) { setMemberFormError('Le nom est obligatoire.'); setMemberFormStatus('error'); return; }
+    setMemberFormStatus('loading'); setMemberFormError('');
+    try {
+      const photo_url = memberImageFile ? await uploadMemberImage(memberImageFile) : (memberForm.photo_url || null);
+      const payload = { ...memberForm, nom: memberForm.nom.trim(), poste: memberForm.poste.trim(), bio: memberForm.bio.trim(), photo_url, ordre: Number(memberForm.ordre) };
+      const result = memberEditingId
+        ? await supabase.from('membres_equipe').update(payload).eq('id', memberEditingId)
+        : await supabase.from('membres_equipe').insert(payload);
+      if (result.error) throw new Error(result.error.message);
+      setMemberFormStatus('success'); setMemberEditingId(null); setMemberForm({ nom: '', poste: '', bio: '', photo_url: '', ordre: 0, actif: true }); setMemberImageFile(null); setMemberImagePreview(''); await loadMembers();
+      setTimeout(() => setMemberFormStatus('idle'), 3000);
+    } catch (err) { setMemberFormError(err instanceof Error ? err.message : 'Erreur lors de la sauvegarde.'); setMemberFormStatus('error'); }
+  };
+
+  const handleMemberEdit = (member: AdminTeamMember) => {
+    setMemberEditingId(member.id); setMemberForm({ nom: member.nom, poste: member.poste ?? '', bio: member.bio ?? '', photo_url: member.photo_url ?? '', ordre: member.ordre ?? 0, actif: member.actif }); setMemberImageFile(null); setMemberImagePreview(member.photo_url ?? ''); setMemberFormStatus('idle'); setMemberFormError(''); window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleMemberDelete = async (member: AdminTeamMember) => {
+    if (!confirm(`Supprimer le membre « ${member.nom} » définitivement ?`)) return;
+    setMemberDeleting(member.id); const { error } = await supabase.from('membres_equipe').delete().eq('id', member.id);
+    if (error) alert(`Impossible de supprimer ce membre : ${error.message}`); else await loadMembers();
+    setMemberDeleting(null);
   };
 
   const exportNewsletter = () => {
@@ -285,7 +354,11 @@ export default function AdminDashboard() {
       const timer = setTimeout(() => loadEvents(), 0);
       return () => clearTimeout(timer);
     }
-  }, [tab, loadMessages, loadEvents]);
+    if (tab === 'team') {
+      const timer = setTimeout(() => loadMembers(), 0);
+      return () => clearTimeout(timer);
+    }
+  }, [tab, loadMessages, loadEvents, loadMembers]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -479,6 +552,7 @@ export default function AdminDashboard() {
     { id: 'stats', label: 'Statistiques', icon: <BarChart2 size={18} /> },
     { id: 'blog', label: 'Gestion Blog', icon: <FileText size={18} /> },
     { id: 'events', label: 'Événements', icon: <CalendarDays size={18} /> },
+    { id: 'team', label: 'Équipe / Membres', icon: <Users size={18} /> },
     { id: 'messages', label: 'Bénévoles', icon: <Users size={18} /> },
     { id: 'security', label: 'Sécurité / Profil', icon: <Shield size={18} /> },
   ];
@@ -652,15 +726,15 @@ export default function AdminDashboard() {
                       <p style={{ fontSize: 13, color: '#9ca3af', fontStyle: 'italic', margin: 0 }}>Aucune inscription pour l&apos;instant.</p>
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                        {newsletterEmails.slice(0, 5).map(e => (
-                          <div key={e.id} className="transition-all hover:translate-y-[-2px]" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderRadius: 12, border: '1px solid #f3f4f6', background: '#fafafa', transition: 'all 0.2s' }}>
-                            <div style={{ fontSize: 14, fontWeight: 600, color: '#0f1824', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>{e.email}</div>
-                            <div style={{ fontSize: 11, color: '#9ca3af', flexShrink: 0 }}>{new Date(e.created_at).toLocaleDateString('fr-FR')}</div>
-                          </div>
+                        {newsletterEmails.map(e => (
+                            <div key={e.id} className="transition-all hover:translate-y-[-2px]" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderRadius: 12, border: '1px solid #f3f4f6', background: '#fafafa', transition: 'all 0.2s' }}>
+                              <div style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 600, color: '#0f1824', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.email}</div>
+                              <div style={{ fontSize: 11, color: '#9ca3af', flexShrink: 0 }}>{new Date(e.created_at).toLocaleDateString('fr-FR')}</div>
+                              <button onClick={() => deleteNewsletter(e.id, e.email)} disabled={newsletterDeleting === e.id} aria-label={`Désinscrire ${e.email}`} title="Désinscrire" style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#fee2e2', color: '#c0392b', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, opacity: newsletterDeleting === e.id ? 0.6 : 1 }}>
+                                {newsletterDeleting === e.id ? <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> : <Trash2 size={14} />}
+                              </button>
+                            </div>
                         ))}
-                        {newsletterEmails.length > 5 && (
-                          <div style={{ fontSize: 12, color: '#9ca3af', textAlign: 'center', marginTop: 4 }}>+ {newsletterEmails.length - 5} autres inscrits</div>
-                        )}
                       </div>
                     )}
                   </div>
@@ -1004,6 +1078,43 @@ export default function AdminDashboard() {
                       })}
                     </div>
                   )}
+                </div>
+              </div>
+            )}
+
+            {/* TEAM TAB */}
+            {tab === 'team' && (
+              <div>
+                <div style={{ marginBottom: 32 }}>
+                  <div style={{ fontSize: 11, letterSpacing: 2, color: '#c0392b', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>CONTENU PUBLIC</div>
+                  <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0f1824', margin: 0 }}>Gestion de l&apos;équipe</h1>
+                  <p style={{ fontSize: 13, color: '#9ca3af', marginTop: 6 }}>Ajoutez, modifiez, masquez ou supprimez les membres affichés dans « À propos ».</p>
+                </div>
+                <div style={{ background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 1px 6px rgba(0,0,0,0.06)', marginBottom: 32 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                    <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0f1824', display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>{memberEditingId ? <><Pencil size={20} color="#c0392b" /> Modifier le membre</> : <><Plus size={20} color="#c0392b" /> Ajouter un membre</>}</h2>
+                    {memberEditingId && <button onClick={() => { setMemberEditingId(null); setMemberForm({ nom: '', poste: '', bio: '', photo_url: '', ordre: 0, actif: true }); setMemberImagePreview(''); setMemberImageFile(null); }} style={{ padding: '7px 14px', background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: 8, cursor: 'pointer', fontSize: 13, color: '#6b7280', fontWeight: 600 }}><X size={14} /> Annuler</button>}
+                  </div>
+                  <form onSubmit={handleMemberSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Nom *</label><input value={memberForm.nom} onChange={e => setMemberForm(f => ({ ...f, nom: e.target.value }))} placeholder="Nom complet" style={inputStyle} /></div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Poste / fonction</label><input value={memberForm.poste} onChange={e => setMemberForm(f => ({ ...f, poste: e.target.value }))} placeholder="Fonction dans l'organisation" style={inputStyle} /></div>
+                    <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Description</label><textarea value={memberForm.bio} onChange={e => setMemberForm(f => ({ ...f, bio: e.target.value }))} placeholder="Présentation du membre" rows={5} style={{ ...inputStyle, resize: 'vertical' }} /></div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Photo</label><input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={e => { const file = e.target.files?.[0]; if (file) { setMemberImageFile(file); setMemberImagePreview(URL.createObjectURL(file)); } }} style={inputStyle} />{memberImagePreview && <img src={memberImagePreview} alt="Aperçu" style={{ width: 72, height: 72, borderRadius: 10, objectFit: 'cover', marginTop: 4 }} />}</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Ordre d&apos;affichage</label><input type="number" min={0} value={memberForm.ordre} onChange={e => setMemberForm(f => ({ ...f, ordre: Number(e.target.value) }))} style={inputStyle} /><label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#374151', marginTop: 8 }}><input type="checkbox" checked={memberForm.actif} onChange={e => setMemberForm(f => ({ ...f, actif: e.target.checked }))} /> Afficher sur le site</label></div>
+                    {memberFormStatus === 'success' && <div style={{ gridColumn: '1 / -1', background: '#dcfce7', border: '1px solid #86efac', borderRadius: 10, padding: '12px 16px', color: '#166534', fontWeight: 600 }}>✓ Membre enregistré avec succès.</div>}
+                    {memberFormStatus === 'error' && <div style={{ gridColumn: '1 / -1', background: '#fee2e2', border: '1px solid #fca5a5', borderRadius: 10, padding: '12px 16px', color: '#991b1b', fontWeight: 600 }}>✗ {memberFormError}</div>}
+                    <div style={{ gridColumn: '1 / -1' }}><button type="submit" disabled={memberFormStatus === 'loading'} style={{ background: '#c0392b', color: '#fff', border: 'none', borderRadius: 12, padding: '12px 28px', fontSize: 15, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, opacity: memberFormStatus === 'loading' ? 0.7 : 1 }}>{memberFormStatus === 'loading' ? <><Loader2 size={16} /> Sauvegarde...</> : memberEditingId ? <><Pencil size={16} /> Sauvegarder</> : <><Plus size={16} /> Ajouter le membre</>}</button></div>
+                  </form>
+                </div>
+                <div style={{ background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 1px 6px rgba(0,0,0,0.06)' }}>
+                  <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0f1824', marginBottom: 24 }}>Membres affichés ({teamMembers.length})</h2>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>{teamMembers.map(member => <div key={member.id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: 14, border: '1px solid #f3f4f6', borderRadius: 12, background: member.actif ? '#fff' : '#fafafa' }}>
+                    {member.photo_url ? <img src={member.photo_url} alt={member.nom} style={{ width: 56, height: 56, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }} /> : <div style={{ width: 56, height: 56, borderRadius: 10, background: '#e5e7eb', flexShrink: 0 }} />}
+                    <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontWeight: 700, color: '#0f1824' }}>{member.nom}</div><div style={{ fontSize: 12, color: '#9ca3af', marginTop: 3 }}>{member.poste || 'Sans fonction'} · ordre {member.ordre}</div></div>
+                    <span style={{ fontSize: 11, padding: '4px 9px', borderRadius: 20, background: member.actif ? '#dcfce7' : '#f3f4f6', color: member.actif ? '#166534' : '#6b7280', fontWeight: 600 }}>{member.actif ? 'Visible' : 'Masqué'}</span>
+                    <button onClick={() => handleMemberEdit(member)} style={{ background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', borderRadius: 10, padding: '8px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600 }}><Pencil size={14} /> Modifier</button>
+                    <button onClick={() => handleMemberDelete(member)} disabled={memberDeleting === member.id} style={{ background: '#fee2e2', color: '#c0392b', border: 'none', borderRadius: 10, padding: '8px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600 }}>{memberDeleting === member.id ? <Loader2 size={14} /> : <Trash2 size={14} />} Supprimer</button>
+                  </div>)}</div>
                 </div>
               </div>
             )}
