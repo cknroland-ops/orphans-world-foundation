@@ -1,62 +1,71 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '../../../lib/supabase';
+import nodemailer from 'nodemailer';
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://orphansworldfoundation.org';
 
 export async function POST(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const email = searchParams.get('email');
+    const body = await req.json();
+    const email = typeof body?.email === 'string' ? body.email.trim() : '';
 
-    // Si email est null (absent) ou mal formaté
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      // TypeScript saura ici que emailToDisplay est forcement une chaîne de caractères (string)
-      const emailToDisplay = email || 'Adresse non fournie';
-      
-      const entities: Record<string, string> = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;',
-      };
-      
-      // On utilise replace sur emailToDisplay qui ne sera jamais null
-      const safeEmail = emailToDisplay.replace(/[&<>"']/g, (char) => entities[char] ?? char);
-
-      return new NextResponse(
-        `<!DOCTYPE html>
-        <html lang="fr">
-          <body style="font-family:sans-serif;text-align:center;padding:80px 24px;background-color:#f9fafb;">
-            <h2 style="color:#c21b28;">Lien de désinscription invalide</h2>
-            <p style="color:#4b5563;">L'adresse renseignée (${safeEmail}) est incorrecte ou absente.</p>
-            <a href="https://orphansworldfoundation.org" style="color:#0f1824;text-decoration:underline;">Retour au site</a>
-          </body>
-        </html>`,
-        { status: 400, headers: { 'content-type': 'text/html; charset=utf-8' } }
-      );
+      return NextResponse.json({ error: 'Adresse email invalide.' }, { status: 400 });
     }
 
-    // Suppression effective dans Supabase
     const supabase = createAdminClient();
-    const { error } = await supabase.from('newsletter').delete().eq('email', email);
+    const { error } = await supabase.from('newsletter').insert({ email });
 
     if (error) {
-      console.error('Erreur Supabase lors de la desinscription:', error);
-      return new NextResponse('Erreur lors de la désinscription.', { status: 500 });
+      if (error.code === '23505') {
+        return NextResponse.json({ error: 'Cet email est déjà inscrit à la newsletter.' }, { status: 409 });
+      }
+      console.error('Supabase newsletter error:', error);
+      return NextResponse.json({ error: "Erreur lors de l'inscription." }, { status: 500 });
     }
 
-    return new NextResponse(
-      `<!DOCTYPE html>
-      <html lang="fr">
-        <body style="font-family:sans-serif;text-align:center;padding:80px 24px;background-color:#f9fafb;">
-          <h2 style="color:#0f1824;">Désinscription confirmée</h2>
-          <p style="color:#4b5563;">L'adresse <strong>${email}</strong> a été retirée de la newsletter d'Orphans World Foundation.</p>
-          <a href="https://orphansworldfoundation.org" style="color:#c21b28;text-decoration:underline;">Retour à l'accueil</a>
-        </body>
-      </html>`,
-      { status: 200, headers: { 'content-type': 'text/html; charset=utf-8' } }
-    );
+    const gmailUser = process.env.GMAIL_USER?.trim();
+    const gmailAppPassword = process.env.GMAIL_APP_PASSWORD?.replace(/\s/g, '');
+    let emailSent = false;
+
+    if (gmailUser && gmailAppPassword) {
+      try {
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: { user: gmailUser, pass: gmailAppPassword },
+        });
+        const unsubscribeUrl = `${BASE_URL}/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}`;
+
+        await transporter.sendMail({
+          from: gmailUser,
+          to: email,
+          replyTo: gmailUser,
+          subject: 'Bienvenue dans la newsletter d’Orphans World Foundation',
+          text: `Merci pour votre inscription à la newsletter d’Orphans World Foundation. Pour vous désinscrire : ${unsubscribeUrl}`,
+          html: `<div style="font-family:Arial,sans-serif;line-height:1.6;color:#0f1824">
+            <h2>Merci pour votre inscription !</h2>
+            <p>Vous recevrez désormais les nouvelles d’Orphans World Foundation et de ses actions en faveur des enfants vulnérables.</p>
+            <p style="font-size:13px;color:#6b7280">Vous ne souhaitez plus recevoir nos messages ?
+              <a href="${unsubscribeUrl}" style="color:#c21b28">Se désinscrire de la newsletter</a>.</p>
+          </div>`,
+        });
+        emailSent = true;
+      } catch (emailError) {
+        console.error('Newsletter confirmation email failed:', emailError);
+      }
+    } else {
+      console.warn('GMAIL_USER or GMAIL_APP_PASSWORD is not configured; confirmation email skipped.');
+    }
+
+    return NextResponse.json({
+      success: true,
+      emailSent,
+      message: emailSent
+        ? 'Inscription réussie. Vérifiez votre boîte de réception et vos courriers indésirables.'
+        : "Inscription réussie, mais le message de bienvenue n’a pas pu être envoyé.",
+    });
   } catch (err) {
-    console.error('Unsubscribe API error:', err);
-    return new NextResponse('Erreur serveur inattendue.', { status: 500 });
+    console.error('Newsletter API error:', err);
+    return NextResponse.json({ error: 'Erreur serveur inattendue.' }, { status: 500 });
   }
 }
