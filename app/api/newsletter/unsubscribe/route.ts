@@ -5,9 +5,6 @@ export async function GET(req: NextRequest) {
   const email = req.nextUrl.searchParams.get('email');
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    const entities: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
-    const safeEmail = email.replace(/[&<>"']/g, (character) => entities[character] ?? character);
-
     return new NextResponse(
       `<!DOCTYPE html><html lang="fr"><body style="font-family:sans-serif;text-align:center;padding:80px 24px">
         <h2 style="color:#c0392b">Lien invalide</h2>
@@ -30,6 +27,9 @@ export async function GET(req: NextRequest) {
         { status: 500, headers: { 'Content-Type': 'text/html' } }
       );
     }
+
+    const entities: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+    const safeEmail = email.replace(/[&<>"']/g, (character) => entities[character] ?? character);
 
     return new NextResponse(
       `<!DOCTYPE html><html lang="fr"><body style="font-family:sans-serif;text-align:center;padding:80px 24px;background:#f9fafb">
